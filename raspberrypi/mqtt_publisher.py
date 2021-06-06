@@ -6,7 +6,7 @@ test_topic = 'testTopic'
 host_ip = '192.168.1.36'
 
 
-class MqttClient():
+class MqttClient:
     def __init__(self, client_id=default_client_id):
         client = mqtt_client.Client(client_id)
         client.on_connect = self.__on_connect
@@ -16,7 +16,7 @@ class MqttClient():
     def __on_connect(self, client, userdata, flags, rc):
         if rc == 0:
             self.connected = True
-            print("Connected to MQTT Broker!")
+            print("Connected to MQTT Broker")
         else:
             print("Failed to connect, return code %d\n", rc)
 
