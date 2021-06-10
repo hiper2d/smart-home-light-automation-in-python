@@ -2,10 +2,7 @@ from flask import Flask, render_template, request
 
 from raspberrypi.mqtt_publisher import MqttClient
 
-mqtt_client = MqttClient()
-mqtt_client.start()
-while not mqtt_client.connected:
-    pass
+
 app = Flask(__name__)
 
 
@@ -14,10 +11,10 @@ def index():
     if request.method == 'POST':
         if request.form.get('On') == 'ON':
             print('on')
-            mqtt_client.publish_to_topic(b'on')
+            mqtt_client.publish(b'on')
         elif request.form.get('Off') == 'OFF':
             print('off')
-            mqtt_client.publish_to_topic(b'off')
+            mqtt_client.publish(b'off')
         else:
             print('unknown')
     elif request.method == 'GET':
@@ -28,4 +25,8 @@ def index():
 
 
 if __name__ == '__main__':
+    mqtt_client = MqttClient()
+    mqtt_client.start()
+    while not mqtt_client.connected:
+        pass
     app.run(host='0.0.0.0')
