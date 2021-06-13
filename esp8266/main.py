@@ -1,31 +1,47 @@
 from umqttsimple import MQTTClient
+from machine import Pin
 import machine
 import time
 import ubinascii
-from machine import Pin
+import uasyncio as asyncio
 
 mqtt_server = '192.168.1.36'
 
 client_id = ubinascii.hexlify(machine.unique_id())
-light_sub = b'home/light'
-register_pub = b'home/register'
+mac = ubinascii.hexlify(network.WLAN().config('mac'),':')
+print("Started device with client id " + client_id.decode() + " and mac: " + mac.decode())
+register_pub = "home/ping"
 led = Pin(2, Pin.OUT)
 
 
-def sub_cb(topic, msg):
-    print(msg)
+def light_message_callback(topic, msg):
+    print("Received message from server: " + msg.decode())
     if msg == b'on':
         led.off()
     else:
         led.on()
 
 
-client = MQTTClient(client_id, mqtt_server)
-client.set_callback(sub_cb)
-client.connect()
-client.publish(register_pub, client_id)
-client.subscribe(b"home/" + client_id)
+async def main_loop():
+    while True:
+        client.check_msg()
+        await asyncio.sleep(1)
 
-while True:
-    client.check_msg()
-    time.sleep(1)
+
+async def ping_loop():
+    while True:
+        msg = client_id + b'|' + mac
+        client.publish(register_pub, msg)
+        print("Sending ping massage to server " + msg.decode())
+        await asyncio.sleep(15)
+
+
+client = MQTTClient(client_id, mqtt_server)
+client.set_callback(light_message_callback)
+client.connect()
+client.subscribe(b'home/' + client_id)
+
+asyncio.create_task(main_loop())
+asyncio.create_task(ping_loop())
+loop = asyncio.get_event_loop()
+loop.run_forever()

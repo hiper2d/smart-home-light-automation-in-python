@@ -1,6 +1,8 @@
+import threading
+
 from flask import Flask, render_template, request
 
-from raspberrypi.mqtt_publisher import MqttClient
+from raspberrypi.mqtt_client import MqttClient
 
 
 app = Flask(__name__)
@@ -10,11 +12,9 @@ app = Flask(__name__)
 def index():
     if request.method == 'POST':
         if request.form.get('On') == 'ON':
-            print('on')
-            mqtt_client.publish(b'on')
+            mqtt_client.send_light_command_to_clients(b'on')
         elif request.form.get('Off') == 'OFF':
-            print('off')
-            mqtt_client.publish(b'off')
+            mqtt_client.send_light_command_to_clients(b'off')
         else:
             print('unknown')
     elif request.method == 'GET':
@@ -27,6 +27,7 @@ def index():
 if __name__ == '__main__':
     mqtt_client = MqttClient()
     mqtt_client.start()
+    threading.Thread(target=mqtt_client.clean_dead_devices, daemon=True).start()
     while not mqtt_client.connected:
         pass
     app.run(host='0.0.0.0')
