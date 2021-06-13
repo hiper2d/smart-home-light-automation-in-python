@@ -7,6 +7,13 @@
     <form method="post" action="/">
         <input type="submit" value="ON" name="On"/>
         <input type="submit" value="OFF" name="Off" />
+        <ul>
+            {% for device in devices %}
+            <li>
+                <div>{{device}}</div>
+            </li>
+            {% endfor %}
+        </ul>
     </form>
 </body>
 </html>

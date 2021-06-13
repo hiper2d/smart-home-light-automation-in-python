@@ -1,5 +1,5 @@
 import time
-from typing import Dict
+from typing import Dict, List
 
 import paho.mqtt.client as mqtt_client
 
@@ -9,6 +9,7 @@ host_ip = '192.168.1.36'
 
 
 class Device:
+
     def __init__(self, mac: str, time: float):
         self.mac = mac
         self.time = time
@@ -18,6 +19,7 @@ class Device:
 
 
 class MqttClient:
+
     def __init__(self, client_id=default_client_id):
         client = mqtt_client.Client(client_id)
         client.on_connect = self._on_connect
@@ -25,6 +27,7 @@ class MqttClient:
         self.client = client
         self.connected = False
         self.devices: Dict[str, Device] = {}
+        self.on_message_finalize = None
 
     def _on_connect(self, client, userdata, flags, rc):
         if rc == 0:
@@ -42,6 +45,8 @@ class MqttClient:
             if client_id not in self.devices:
                 print(f"Registering new device {client_id}")
             self.devices[client_id] = Device(mac, time.time())
+            if self.on_message_finalize:
+                self.on_message_finalize(self.get_devices_as_list())
 
     def start(self):
         self.client.loop_start()
@@ -59,6 +64,9 @@ class MqttClient:
 
     def subscribe_to_ping_messages_from_client(self, topic=ping_sub):
         self.client.subscribe(topic)
+
+    def get_devices_as_list(self) -> List[str]:
+        return [device.mac for key, device in self.devices.items()]
 
     def clean_dead_devices(self):
         while True:
