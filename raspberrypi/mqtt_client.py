@@ -46,7 +46,7 @@ class MqttClient:
                 print(f"Registering new device {client_id}")
             self.devices[client_id] = Device(mac, time.time())
             if self.on_message_finalize:
-                self.on_message_finalize(self.get_devices_as_list())
+                self.on_message_finalize(client_id)
 
     def start(self):
         self.client.loop_start()
@@ -65,8 +65,8 @@ class MqttClient:
     def subscribe_to_ping_messages_from_client(self, topic=ping_sub):
         self.client.subscribe(topic)
 
-    def get_devices_as_list(self) -> List[str]:
-        return [device.mac for key, device in self.devices.items()]
+    def get_active_client_ids(self) -> List[str]:
+        return [key for key in self.devices.keys()]
 
     def clean_dead_devices(self):
         while True:

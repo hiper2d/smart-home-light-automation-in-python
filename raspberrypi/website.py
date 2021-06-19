@@ -11,9 +11,9 @@ mqtt_client = MqttClient()
 announcer = MessageAnnouncer()
 
 
-def _on_message_announce(items: List[str]):
-    announcer.announce("ABC")
-    print(items)
+def _on_message_announce(msg: str):
+    announcer.announce(msg)
+    print(msg)
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -27,16 +27,16 @@ def index():
             print('unknown')
     elif request.method == 'GET':
         form = request.form
-        return render_template('index.html', form=form, devices=mqtt_client.get_devices_as_list())
+        return render_template('index.html', form=form, devices=mqtt_client.get_active_client_ids())
     return render_template('index.html')
 
 
 @app.route('/listen', methods=['GET'])
 def listen():
     def stream():
-        messages = announcer.listen()  # returns a queue.Queue
+        messages = announcer.listen()
         while True:
-            msg = messages.get()  # blocks until a new message arrives
+            msg = messages.get()
             yield msg
     return Response(stream(), mimetype='text/event-stream')
 
