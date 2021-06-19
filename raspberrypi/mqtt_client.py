@@ -27,7 +27,8 @@ class MqttClient:
         self.client = client
         self.connected = False
         self.devices: Dict[str, Device] = {}
-        self.on_message_finalize = None
+        self.on_device_added = None
+        self.on_device_removed = None
 
     def _on_connect(self, client, userdata, flags, rc):
         if rc == 0:
@@ -45,8 +46,8 @@ class MqttClient:
             if client_id not in self.devices:
                 print(f"Registering new device {client_id}")
             self.devices[client_id] = Device(mac, time.time())
-            if self.on_message_finalize:
-                self.on_message_finalize(client_id)
+            if self.on_device_added:
+                self.on_device_added(client_id)
 
     def start(self):
         self.client.loop_start()
@@ -73,11 +74,13 @@ class MqttClient:
             time.sleep(30)
             print(f"Refreshing {len(self.devices.keys())} devices")
             refreshed_devices: Dict[str, Device] = {}
-            for key, value in self.devices.items():
-                if time.time() - value.time > 30:
-                    print(f"Device {key} is offline")
+            for device_id, device in self.devices.items():
+                if time.time() - device.time > 30:
+                    print(f"Device {device_id} is offline")
+                    if self.on_device_removed:
+                        self.on_device_removed(device_id)
                 else:
-                    refreshed_devices[key] = value
+                    refreshed_devices[device_id] = device
             self.devices = refreshed_devices
 
 

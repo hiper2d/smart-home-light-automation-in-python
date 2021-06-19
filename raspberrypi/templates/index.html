@@ -1,29 +1,39 @@
 <html>
-<head>
-    <link rel="stylesheet" href='/static/style.css' />
-    <script>
-        function fillContainerFromSSE(id,url) {
-            var targetContainer = document.getElementById(id);
-            var eventSource = new EventSource(url)
-            eventSource.onmessage = function(e) {
-                targetContainer.innerHTML = e.data;
+    <head>
+        <link rel="stylesheet" href='/static/style.css' />
+    </head>
+    <body>
+        <h1>Light Control, Nuffy Styled</h1>
+        <form method="post" action="/">
+            <input type="submit" value="ON" name="On"/>
+            <input type="submit" value="OFF" name="Off" />
+            <ul id="devices"></ul>
+        </form>
+    </body>
+    <script type="text/javascript">
+        function fillContainerFromSSE(url) {
+            const eventSource = new EventSource(url);
+            eventSource.onmessage = function (e) {
+                const data = JSON.parse(e.data)
+                const ul = document.querySelector('#devices');
+                const lis = [...document.querySelectorAll('#devices>li')];
+                const existingDeviceWithSameId = lis.find(li => li.id === data.id)
+                if(!existingDeviceWithSameId) {
+                    const newLi = document.createElement('li')
+                    newLi.setAttribute('id', data.id);
+                    newLi.onclick = function(e) {
+                        console.log('clicked ' + this.id);
+                    }
+                    ul.appendChild(newLi).textContent = data.id;
+                } else {
+                    if (data.event === 'remove') {
+                        ul.removeChild(existingDeviceWithSameId);
+                    } else {
+                        console.log('device is already shown');
+                    }
+                }
             };
-        };
-        fillContainerFromSSE("event_div","/listen");
+        }
+        fillContainerFromSSE("/listen");
     </script>
-</head>
-<body>
-    <h1>Light Control, Nuffy Styled</h1>
-    <form method="post" action="/">
-        <input type="submit" value="ON" name="On"/>
-        <input type="submit" value="OFF" name="Off" />
-        <ul>
-            {% for device in devices %}
-            <li>
-                <div>{{device}}</div>
-            </li>
-            {% endfor %}
-        </ul>
-    </form>
-</body>
 </html>

@@ -1,5 +1,5 @@
+import json
 import threading
-from typing import List
 
 from flask import Flask, render_template, request, Response
 
@@ -11,9 +11,17 @@ mqtt_client = MqttClient()
 announcer = MessageAnnouncer()
 
 
-def _on_message_announce(msg: str):
-    announcer.announce(msg)
-    print(msg)
+def format_sse(client_id: str, event=None) -> str:
+    msg = {'id': client_id, 'event': event}
+    return json.dumps(msg) + '\n\n'
+
+
+def _on_device_added(device_id: str):
+    announcer.announce(format_sse(client_id=device_id))
+
+
+def _on_device_removed(device_id: str):
+    announcer.announce(format_sse(client_id=device_id, event='remove'))
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -37,14 +45,15 @@ def listen():
         messages = announcer.listen()
         while True:
             msg = messages.get()
-            yield msg
+            yield 'data: %s\n\n' % msg
     return Response(stream(), mimetype='text/event-stream')
 
 
 if __name__ == '__main__':
     mqtt_client = MqttClient()
     mqtt_client.start()
-    mqtt_client.on_message_finalize = _on_message_announce
+    mqtt_client.on_device_added = _on_device_added
+    mqtt_client.on_device_removed = _on_device_removed
     threading.Thread(target=mqtt_client.clean_dead_devices, daemon=True).start()
     while not mqtt_client.connected:
         pass
