@@ -4,6 +4,7 @@ import machine
 import time
 import ubinascii
 import uasyncio as asyncio
+import functions
 
 mqtt_server = '192.168.1.36'
 
@@ -18,6 +19,8 @@ def light_message_callback(topic, msg):
     print("Received message from server: " + msg.decode())
     if msg == b'on':
         led.off()
+    elif msg == b'red':
+        functions.all_on()
     else:
         led.on()
 
