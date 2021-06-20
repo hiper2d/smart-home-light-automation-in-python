@@ -1,12 +1,14 @@
 import json
 import threading
+import os.path
 
-from flask import Flask, render_template, request, Response
+from flask import Flask, render_template, request, Response, send_from_directory
 
 from raspberrypi.mqtt_client import MqttClient
 from raspberrypi.util import MessageAnnouncer
 
-app = Flask(__name__)
+template_dir = os.path.abspath('public')
+app = Flask(__name__, template_folder=template_dir, static_url_path='/', static_folder=template_dir)
 mqtt_client = MqttClient()
 announcer = MessageAnnouncer()
 
@@ -50,11 +52,14 @@ def listen():
 
 
 if __name__ == '__main__':
-    mqtt_client = MqttClient()
-    mqtt_client.start()
-    mqtt_client.on_device_added = _on_device_added
-    mqtt_client.on_device_removed = _on_device_removed
-    threading.Thread(target=mqtt_client.clean_dead_devices, daemon=True).start()
-    while not mqtt_client.connected:
-        pass
+    try:
+        mqtt_client = MqttClient()
+        mqtt_client.start()
+        mqtt_client.on_device_added = _on_device_added
+        mqtt_client.on_device_removed = _on_device_removed
+        threading.Thread(target=mqtt_client.clean_dead_devices, daemon=True).start()
+        while not mqtt_client.connected:
+            pass
+    except:
+        print('Cannot connect to MQTT broker')
     app.run(host='0.0.0.0')
