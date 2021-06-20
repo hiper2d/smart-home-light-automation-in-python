@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {RaspberrypiService} from "./core/raspberrypi.service";
 import {Observable} from "rxjs";
+import {SseService} from "./core/sse.service";
 
 @Component({
   selector: 'app-root',
@@ -11,7 +12,7 @@ export class AppComponent implements OnInit {
 
   devices: Array<string> = [];
 
-  constructor(private raspberrypiService: RaspberrypiService) {
+  constructor(private raspberrypiService: RaspberrypiService, private sseService: SseService) {
 
   }
 
@@ -21,6 +22,9 @@ export class AppComponent implements OnInit {
 
   loadDevices() {
     this.raspberrypiService.getDevices().subscribe(listOfDevices => this.devices = listOfDevices);
+    this.sseService.getServerSentEvent().subscribe((msg: MessageEvent) => {
+      console.log(JSON.parse(msg.data))
+    });
   }
 
   everythingOn() {

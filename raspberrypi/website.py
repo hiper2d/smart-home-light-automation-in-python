@@ -63,14 +63,14 @@ def listen():
 
 
 if __name__ == '__main__':
-    # try:
-    #     mqtt_client = MqttClient()
-    #     mqtt_client.start()
-    #     mqtt_client.on_device_added = _on_device_added
-    #     mqtt_client.on_device_removed = _on_device_removed
-    #     threading.Thread(target=mqtt_client.clean_dead_devices, daemon=True).start()
-    #     while not mqtt_client.connected:
-    #         pass
-    # except:
-    #     print('Cannot connect to MQTT broker')
+    try:
+        mqtt_client = MqttClient()
+        mqtt_client.start()
+        mqtt_client.on_device_added = _on_device_added
+        mqtt_client.on_device_removed = _on_device_removed
+        threading.Thread(target=mqtt_client.clean_dead_devices, daemon=True).start()
+        while not mqtt_client.connected:
+            pass
+    except:
+        print('Cannot connect to MQTT broker')
     app.run(host='0.0.0.0')
