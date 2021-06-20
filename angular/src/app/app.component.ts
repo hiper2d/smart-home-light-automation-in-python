@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {RaspberrypiService} from "./core/raspberrypi.service";
-import {Observable} from "rxjs";
 import {SseService} from "./core/sse.service";
+import {SseData} from "./model/sse-data";
 
 @Component({
   selector: 'app-root',
@@ -23,7 +23,15 @@ export class AppComponent implements OnInit {
   loadDevices() {
     this.raspberrypiService.getDevices().subscribe(listOfDevices => this.devices = listOfDevices);
     this.sseService.getServerSentEvent().subscribe((msg: MessageEvent) => {
-      console.log(JSON.parse(msg.data))
+      const sseMessageData = JSON.parse(msg.data) as SseData;
+      let index = this.devices.indexOf(sseMessageData.id);
+      if (sseMessageData.event == 'remove' && index > -1) {
+        this.devices.splice(index, 1)
+      } else {
+        if (index === -1) {
+          this.devices.push(sseMessageData.id);
+        }
+      }
     });
   }
 

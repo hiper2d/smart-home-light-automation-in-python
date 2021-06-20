@@ -34,12 +34,12 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/device', methods=['GET'])
+@app.route('/api/device', methods=['GET'])
 def device():
     return make_response(jsonify(mqtt_client.get_active_client_ids()), 200)
 
 
-@app.route('/toggle', methods=['GET'])
+@app.route('/api/toggle', methods=['GET'])
 def toggle_all():
     operation = request.args.get('operation')
     if operation == 'on':
@@ -52,7 +52,7 @@ def toggle_all():
     return make_response(jsonify(data), 200)
 
 
-@app.route('/listen', methods=['GET'])
+@app.route('/api/listen', methods=['GET'])
 def listen():
     def stream():
         messages = announcer.listen()

@@ -1,4 +1,4 @@
-export interface SseMessage {
+export interface SseData {
   id: string,
   event: string
 }
