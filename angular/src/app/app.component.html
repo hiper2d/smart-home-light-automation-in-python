@@ -1,8 +1,8 @@
 <div>Devices</div>
 <div class="controls">
-  <button mat-button>All On</button>
-  <button mat-button>All Off</button>
+  <button mat-raised-button color="primary" (click)="everythingOn()">All On</button>
+  <button mat-raised-button color="primary" (click)="everythingOff()">All Off</button>
 </div>
 <ul>
-
+  <li *ngFor="let device of devices" (click)="hitDevice(device)">{{device}}</li>
 </ul>
