@@ -1,10 +1,10 @@
-import {RGB} from "ngx-color/helpers/color.interfaces";
+import {RGB, RGBA} from "ngx-color/helpers/color.interfaces";
 
-export interface Alpha {
-  value: number;
+export interface ColorSwitcher {
+  on: boolean;
 }
 
 export class RgbaCommand {
-  constructor(public on: boolean, public rgb: RGB, public a: Alpha) {
+  constructor(public on: ColorSwitcher, public rgba: RGBA) {
   }
 }
