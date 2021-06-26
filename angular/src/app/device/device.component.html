@@ -1,4 +1,8 @@
-<span (click)="rgbaChang()">{{device}}</span>
-<mat-slide-toggle class="example-margin" color="accent" [(ngModel)]="on"></mat-slide-toggle>
-<color-hue-picker *ngIf="on" color="#fff" (onChangeComplete)="rgbChanged($event)"></color-hue-picker>
-<color-alpha-picker *ngIf="on" color="#fff" (onChangeComplete)="alphaChanged($event)"></color-alpha-picker>
+<span>{{device}}</span>
+<mat-button-toggle-group value="off" (change)="modeChange($event.value)">
+  <mat-button-toggle value="off">Off</mat-button-toggle>
+  <mat-button-toggle value="white">White</mat-button-toggle>
+  <mat-button-toggle value="custom" [style.color]="customColorHex">Custom</mat-button-toggle>
+</mat-button-toggle-group>
+<color-hue-picker *ngIf="customColorSwitcher.on" [color]="customColor" (onChangeComplete)="rgbChanged($event)"></color-hue-picker>
+<color-alpha-picker *ngIf="customColorSwitcher.on" [color]="customColor" (onChangeComplete)="alphaChanged($event)"></color-alpha-picker>
