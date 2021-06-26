@@ -4,5 +4,7 @@
   <button mat-raised-button color="primary" (click)="everythingOff()">All Off</button>
 </div>
 <ul>
-  <li *ngFor="let device of devices" (click)="hitDevice(device)">{{device}}</li>
+  <li *ngFor="let device of devices" (click)="hitDevice(device)">
+    <app-device [device]="device"(rgbaChange)="deviceRgbaChange(device, $event)"></app-device>
+  </li>
 </ul>

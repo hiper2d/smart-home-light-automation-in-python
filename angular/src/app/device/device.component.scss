@@ -1,0 +1,15 @@
+:host {
+  align-items: center;
+  display: flex;
+  height: 30px;
+  justify-content: normal;
+
+  span {
+    margin-right: 10px;
+  }
+
+  mat-slide-toggle {
+    margin-right: 20px;
+  }
+}
+

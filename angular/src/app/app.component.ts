@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {RaspberrypiService} from "./core/raspberrypi.service";
 import {SseService} from "./core/sse.service";
 import {SseData} from "./model/sse-data";
+import {RgbaCommand} from "./model/rgba-command";
 
 @Component({
   selector: 'app-root',
@@ -10,10 +11,9 @@ import {SseData} from "./model/sse-data";
 })
 export class AppComponent implements OnInit {
 
-  devices: Array<string> = [];
+  devices: Array<string> = ['sdfsdfdsf'];
 
   constructor(private raspberrypiService: RaspberrypiService, private sseService: SseService) {
-
   }
 
   ngOnInit(): void {
@@ -45,5 +45,9 @@ export class AppComponent implements OnInit {
 
   hitDevice(device: string) {
     console.log('Clicked at ' + device)
+  }
+
+  deviceRgbaChange(device: string, rgbaCommand: RgbaCommand) {
+    console.log(rgbaCommand);
   }
 }

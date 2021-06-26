@@ -1,0 +1,4 @@
+<span (click)="rgbaChang()">{{device}}</span>
+<mat-slide-toggle class="example-margin" color="accent" [(ngModel)]="on"></mat-slide-toggle>
+<color-hue-picker *ngIf="on" color="#fff" (onChangeComplete)="rgbChanged($event)"></color-hue-picker>
+<color-alpha-picker *ngIf="on" color="#fff" (onChangeComplete)="alphaChanged($event)"></color-alpha-picker>
