@@ -13,6 +13,7 @@ export class DeviceComponent implements OnInit {
   static readonly WHITE = new RgbaCommand({on: true}, {r: 255, g: 255, b: 255, a: 1})
   static readonly OFF = new RgbaCommand({on: false}, {r: 0, g: 0, b: 0, a: 0})
 
+  @Input() deviceName?: string;
   @Output('rgbaChange') emitter = new EventEmitter<RgbaCommand>();
   customColorSwitcher: ColorSwitcher = {on: false};
   customColor: RGBA = {r: 255, g: 255, b: 255, a: 1};

@@ -3,19 +3,11 @@ from typing import Dict, List
 
 import paho.mqtt.client as mqtt_client
 
+from util import Device
+
 default_client_id = 'Raspberry Pi Server'
 ping_sub = 'home/ping'
 host_ip = '192.168.1.36'
-
-
-class Device:
-
-    def __init__(self, mac: str, time: float):
-        self.mac = mac
-        self.time = time
-
-    def __repr__(self) -> str:
-        return f"device with mac address: {self.mac}, registered at {time.ctime(self.time)}"
 
 
 class MqttClient:

@@ -1,10 +1,8 @@
 <ul>
   <li>
-    <div>{{allDevice}}</div>
-    <app-device (rgbaChange)="allDevicesChange($event)"></app-device>
+    <app-device [deviceName]="allDevice" (rgbaChange)="allDevicesChange($event)"></app-device>
   </li>
   <li *ngFor="let device of devices">
-    <div>{{device}}</div>
-    <app-device (rgbaChange)="deviceChange(device, $event)"></app-device>
+    <app-device [deviceName]="device" (rgbaChange)="deviceChange(device, $event)"></app-device>
   </li>
 </ul>
