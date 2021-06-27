@@ -11,6 +11,7 @@ import {RGBA} from "ngx-color/helpers/color.interfaces";
 export class DeviceComponent implements OnInit {
 
   static readonly WHITE = new RgbaCommand({on: true}, {r: 255, g: 255, b: 255, a: 1})
+  static readonly OFF = new RgbaCommand({on: false}, {r: 0, g: 0, b: 0, a: 0})
 
   @Output('rgbaChange') emitter = new EventEmitter<RgbaCommand>();
   customColorSwitcher: ColorSwitcher = {on: false};
@@ -32,7 +33,7 @@ export class DeviceComponent implements OnInit {
         break;
       case 'off':
         this.customColorSwitcher.on = false;
-        this.emitter.emit(this.rgbaCommand);
+        this.emitter.emit(DeviceComponent.OFF);
         break;
       case 'white':
         this.customColorSwitcher.on = false;

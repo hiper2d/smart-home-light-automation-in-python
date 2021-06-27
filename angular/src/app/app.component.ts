@@ -14,7 +14,7 @@ import {Device} from "./model/device";
 export class AppComponent implements OnInit {
 
   allDevice: string = 'All Devices';
-  devices: Array<string> = ['sdfsdfdsf', 'asdfsdf'];
+  devices: Array<string> = [];
 
   constructor(private raspberrypiService: RaspberrypiService, private sseService: SseService) {
   }
@@ -24,7 +24,7 @@ export class AppComponent implements OnInit {
   }
 
   loadDevices() {
-    //this.raspberrypiService.getDevices().subscribe(listOfDevices => this.devices = listOfDevices);
+    this.raspberrypiService.getDevices().subscribe(listOfDevices => this.devices = listOfDevices);
     this.sseService.getServerSentEvent().subscribe((msg: MessageEvent) => {
       const sseMessageData = JSON.parse(msg.data) as SseData;
       let index = this.devices.indexOf(sseMessageData.id);

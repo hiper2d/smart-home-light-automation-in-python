@@ -17,12 +17,11 @@ led = Pin(2, Pin.OUT)
 
 def light_message_callback(topic, msg):
     print("Received message from server: " + msg.decode())
-    if msg == b'on':
-        led.off()
-    elif msg == b'red':
-        functions.all_on()
+    [r,g,b,a] = msg.decode().split(',')
+    if a == '0':
+        functions.all_off()
     else:
-        led.on()
+        functions.choose_color(r, g, b)
 
 
 async def main_loop():
@@ -48,3 +47,5 @@ asyncio.create_task(main_loop())
 asyncio.create_task(ping_loop())
 loop = asyncio.get_event_loop()
 loop.run_forever()
+
+

@@ -39,15 +39,28 @@ def device():
     return make_response(jsonify(mqtt_client.get_active_client_ids()), 200)
 
 
+# @app.route('/api/toggle<id>', methods=['GET'])
+# def toggle_all(id: str):
+#     rgba = request.args.get('rgba')
+#     [r, g, b, a] = rgba.split(',')
+#     if a == 0:
+#         mqtt_client.send_light_command_to_clients(b'on')
+#     elif operation == 'off':
+#         mqtt_client.send_light_command_to_clients(b'off')
+#     else:
+#         print('Unknown operation ' + operation)
+#     data = {'message': 'Done', 'code': 'SUCCESS'}
+#     return make_response(jsonify(data), 200)
+
+
 @app.route('/api/toggle', methods=['GET'])
 def toggle_all():
-    operation = request.args.get('operation')
-    if operation == 'on':
-        mqtt_client.send_light_command_to_clients(b'on')
-    elif operation == 'off':
+    rgba = request.args.get('rgba')
+    [r, g, b, a] = rgba.split(',')
+    if a == 0:
         mqtt_client.send_light_command_to_clients(b'off')
     else:
-        print('Unknown operation ' + operation)
+        mqtt_client.send_light_command_to_clients(rgba)
     data = {'message': 'Done', 'code': 'SUCCESS'}
     return make_response(jsonify(data), 200)
 

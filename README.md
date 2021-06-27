@@ -7,6 +7,7 @@ The goal of this project:
 
 This project consists of the following:
 * ESP8266 firmware in MicroPython for devices
+* SMD5050 RGB LED Strip Lights as controlled devices
 * Website in Angular 12 server by Python/Flask webserver hosted on Raspberry Pi server to control devices
 * SQL Lite database on Raspberry Pi to remember device user settings
 * Mosquitto messaging queue for MQTT communication between  

@@ -59,7 +59,7 @@ class MqttClient:
             result = self.client.publish(topic, msg)
             status = result[0]
             if status == 0:
-                print(f"Send `{msg.decode()}` to topic `{topic}`")
+                print(f"Send `{msg}` to topic `{topic}`")
             else:
                 print(f"Failed to send message to topic {topic}")
 
