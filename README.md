@@ -16,5 +16,8 @@ This project consists of the following:
 
 This README is empty for now because the project has just been started.
 
+This is how the web interface looks like for now:
+![interface](./images/interface.png)
+
 Diagram with no text explanation for now about the device register process:
 ![smart light ping](./images/smart_light_ping.png)

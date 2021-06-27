@@ -53,15 +53,19 @@ class MqttClient:
         self.client.loop_start()
         self.client.connect(host_ip)
 
-    def send_light_command_to_clients(self, msg: bytes):
+    def send_light_command_to_clients(self, msg: str):
         for device in self.devices.keys():
-            topic = f"home/{device}"
-            result = self.client.publish(topic, msg)
-            status = result[0]
-            if status == 0:
-                print(f"Send `{msg}` to topic `{topic}`")
-            else:
-                print(f"Failed to send message to topic {topic}")
+            self.send_light_command_to_client(device, msg)
+
+    def send_light_command_to_client(self, device_id: str, msg: str):
+        topic = f"home/{device_id}"
+        self.client.publish(f"home/{device_id}", msg)
+        result = self.client.publish(topic, msg)
+        status = result[0]
+        if status == 0:
+            print(f"Send `{msg}` to topic `{topic}`")
+        else:
+            print(f"Failed to send message to topic {topic}")
 
     def subscribe_to_ping_messages_from_client(self, topic=ping_sub):
         self.client.subscribe(topic)

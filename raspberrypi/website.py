@@ -5,11 +5,11 @@ import os.path
 from flask import Flask, render_template, request, Response, send_from_directory, make_response, jsonify
 from flask_cors import CORS
 
-from raspberrypi.mqtt_client import MqttClient
-from raspberrypi.util import MessageAnnouncer
+from mqtt_client import MqttClient
+from util import MessageAnnouncer
 
 template_dir = os.path.abspath('public')
-app = Flask(__name__, template_folder=template_dir, static_url_path='/', static_folder=template_dir)
+app = Flask(__name__, template_folder=template_dir, static_url_path='', static_folder=template_dir)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 mqtt_client = MqttClient()
@@ -39,28 +39,18 @@ def device():
     return make_response(jsonify(mqtt_client.get_active_client_ids()), 200)
 
 
-# @app.route('/api/toggle<id>', methods=['GET'])
-# def toggle_all(id: str):
-#     rgba = request.args.get('rgba')
-#     [r, g, b, a] = rgba.split(',')
-#     if a == 0:
-#         mqtt_client.send_light_command_to_clients(b'on')
-#     elif operation == 'off':
-#         mqtt_client.send_light_command_to_clients(b'off')
-#     else:
-#         print('Unknown operation ' + operation)
-#     data = {'message': 'Done', 'code': 'SUCCESS'}
-#     return make_response(jsonify(data), 200)
+@app.route('/api/toggle/<client_id>', methods=['GET'])
+def toggle_one (client_id: str):
+    rgb = request.args.get('rgb')
+    mqtt_client.send_light_command_to_client(client_id, rgb)
+    data = {'message': 'Done', 'code': 'SUCCESS'}
+    return make_response(jsonify(data), 200)
 
 
 @app.route('/api/toggle', methods=['GET'])
 def toggle_all():
-    rgba = request.args.get('rgba')
-    [r, g, b, a] = rgba.split(',')
-    if a == 0:
-        mqtt_client.send_light_command_to_clients(b'off')
-    else:
-        mqtt_client.send_light_command_to_clients(rgba)
+    rgb = request.args.get('rgb')
+    mqtt_client.send_light_command_to_clients(rgb)
     data = {'message': 'Done', 'code': 'SUCCESS'}
     return make_response(jsonify(data), 200)
 

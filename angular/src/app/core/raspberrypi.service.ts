@@ -15,12 +15,12 @@ export class RaspberrypiService{
   }
 
   toggleOne(deviceId: string, message: string): Observable<any> {
-    const params = new HttpParams().set('rgba', message);
+    const params = new HttpParams().set('rgb', message);
     return this.http.get(ApiConst.TOGGLE + '/' + deviceId, {params})
   }
 
   toggleAll(message: string): Observable<any> {
-    const params = new HttpParams().set('rgba', message);
+    const params = new HttpParams().set('rgb', message);
     return this.http.get(ApiConst.TOGGLE, {params})
   }
 }

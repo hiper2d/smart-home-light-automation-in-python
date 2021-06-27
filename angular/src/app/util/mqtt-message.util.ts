@@ -8,14 +8,11 @@ function scale(color: number, brightness: number): number {
 
 export class MqttMessageUtil {
 
-  static readonly OFF = '0,0,0,0';
-
-
   static convertRgbaCommandToMqttMessage(command: RgbaCommand): string {
     const r = command.rgba.r;
     const g = command.rgba.g;
     const b = command.rgba.b;
     const a = command.rgba.a;
-    return `${scale(r,a)},${scale(g,a)},${scale(b,a)},${a}`;
+    return `${scale(r,a)},${scale(g,a)},${scale(b,a)}`;
   }
 }

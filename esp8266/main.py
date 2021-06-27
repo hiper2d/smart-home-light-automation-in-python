@@ -15,13 +15,15 @@ register_pub = "home/ping"
 led = Pin(2, Pin.OUT)
 
 
-def light_message_callback(topic, msg):
+def light_message_callback(topic: str, msg: bytes):
     print("Received message from server: " + msg.decode())
-    [r,g,b,a] = msg.decode().split(',')
-    if a == '0':
+    [r, g, b] = msg.decode().split(',')
+    if r == '0' and g == '0' and b == '0':
         functions.all_off()
+        led.on()
     else:
-        functions.choose_color(r, g, b)
+        functions.choose_color(int(r), int(g), int(b))
+        led.off()
 
 
 async def main_loop():
@@ -47,5 +49,3 @@ asyncio.create_task(main_loop())
 asyncio.create_task(ping_loop())
 loop = asyncio.get_event_loop()
 loop.run_forever()
-
-
