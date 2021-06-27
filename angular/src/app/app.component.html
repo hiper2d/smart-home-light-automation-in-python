@@ -1,10 +1,10 @@
-<div class="title">Devices</div>
-<div class="controls">
-  <button mat-raised-button color="primary" (click)="everythingOn()">All On</button>
-  <button mat-raised-button color="primary" (click)="everythingOff()">All Off</button>
-</div>
 <ul>
+  <li>
+    <div>{{allDevice}}</div>
+    <app-device (rgbaChange)="allDevicesChange($event)"></app-device>
+  </li>
   <li *ngFor="let device of devices">
-    <app-device [device]="device"(rgbaChange)="deviceRgbaChange(device, $event)"></app-device>
+    <div>{{device}}</div>
+    <app-device (rgbaChange)="deviceChange(device, $event)"></app-device>
   </li>
 </ul>

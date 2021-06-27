@@ -14,8 +14,13 @@ export class RaspberrypiService{
     return this.http.get<Array<string>>(ApiConst.DEVICE);
   }
 
-  everythingToggle(operation: string): Observable<any> {
-    const params = new HttpParams().set('operation', operation);
+  toggleOne(deviceId: string, message: string): Observable<any> {
+    const params = new HttpParams().set('rgba', message);
+    return this.http.get(ApiConst.TOGGLE + '/' + deviceId, {params})
+  }
+
+  toggleAll(message: string): Observable<any> {
+    const params = new HttpParams().set('rgba', message);
     return this.http.get(ApiConst.TOGGLE, {params})
   }
 }

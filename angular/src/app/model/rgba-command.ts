@@ -5,6 +5,7 @@ export interface ColorSwitcher {
 }
 
 export class RgbaCommand {
+
   constructor(public on: ColorSwitcher, public rgba: RGBA) {
   }
 }

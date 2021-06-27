@@ -1,8 +1,9 @@
-<span>{{device}}</span>
 <mat-button-toggle-group value="off" (change)="modeChange($event.value)">
   <mat-button-toggle value="off">Off</mat-button-toggle>
   <mat-button-toggle value="white">White</mat-button-toggle>
   <mat-button-toggle value="custom" [style.color]="customColorHex">Custom</mat-button-toggle>
 </mat-button-toggle-group>
-<color-hue-picker *ngIf="customColorSwitcher.on" [color]="customColor" (onChangeComplete)="rgbChanged($event)"></color-hue-picker>
-<color-alpha-picker *ngIf="customColorSwitcher.on" [color]="customColor" (onChangeComplete)="alphaChanged($event)"></color-alpha-picker>
+<div class="pickers">
+  <color-hue-picker *ngIf="customColorSwitcher.on" [color]="customColor" (onChangeComplete)="rgbChanged($event)"></color-hue-picker>
+  <color-alpha-picker *ngIf="customColorSwitcher.on" [color]="customColor" (onChangeComplete)="alphaChanged($event)"></color-alpha-picker>
+</div>

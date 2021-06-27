@@ -3,6 +3,8 @@ import {RaspberrypiService} from "./core/raspberrypi.service";
 import {SseService} from "./core/sse.service";
 import {SseData} from "./model/sse-data";
 import {RgbaCommand} from "./model/rgba-command";
+import {MqttMessageUtil} from "./util/mqtt-message.util";
+import {Device} from "./model/device";
 
 @Component({
   selector: 'app-root',
@@ -11,7 +13,8 @@ import {RgbaCommand} from "./model/rgba-command";
 })
 export class AppComponent implements OnInit {
 
-  devices: Array<string> = ['sdfsdfdsf'];
+  allDevice: string = 'All Devices';
+  devices: Array<string> = ['sdfsdfdsf', 'asdfsdf'];
 
   constructor(private raspberrypiService: RaspberrypiService, private sseService: SseService) {
   }
@@ -21,7 +24,7 @@ export class AppComponent implements OnInit {
   }
 
   loadDevices() {
-    this.raspberrypiService.getDevices().subscribe(listOfDevices => this.devices = listOfDevices);
+    //this.raspberrypiService.getDevices().subscribe(listOfDevices => this.devices = listOfDevices);
     this.sseService.getServerSentEvent().subscribe((msg: MessageEvent) => {
       const sseMessageData = JSON.parse(msg.data) as SseData;
       let index = this.devices.indexOf(sseMessageData.id);
@@ -35,19 +38,13 @@ export class AppComponent implements OnInit {
     });
   }
 
-  everythingOn() {
-    this.raspberrypiService.everythingToggle('on').subscribe();
+  allDevicesChange(rgbaCommand: RgbaCommand) {
+    const mqttMessage = MqttMessageUtil.convertRgbaCommandToMqttMessage(rgbaCommand);
+    this.raspberrypiService.toggleAll(mqttMessage).subscribe();
   }
 
-  everythingOff() {
-    this.raspberrypiService.everythingToggle('off').subscribe();
-  }
-
-  hitDevice(device: string) {
-    console.log('Clicked at ' + device)
-  }
-
-  deviceRgbaChange(device: string, rgbaCommand: RgbaCommand) {
-    console.log(rgbaCommand);
+  deviceChange(deviceId: string, rgbaCommand: RgbaCommand) {
+    const mqttMessage = MqttMessageUtil.convertRgbaCommandToMqttMessage(rgbaCommand);
+    this.raspberrypiService.toggleOne(deviceId, mqttMessage).subscribe();
   }
 }
