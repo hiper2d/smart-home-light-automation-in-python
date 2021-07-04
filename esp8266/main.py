@@ -1,7 +1,7 @@
 from umqttsimple import MQTTClient
 from machine import Pin
 import machine
-import time
+import ujson
 import ubinascii
 import uasyncio as asyncio
 import functions
@@ -34,9 +34,11 @@ async def main_loop():
 
 async def ping_loop():
     while True:
-        msg = client_id + b'|' + mac
-        client.publish(register_pub, msg)
-        print("Sending ping massage to server " + msg.decode())
+        rgb = functions.get_colors()
+        device = {'id': client_id, 'mac': mac, 'rgb': rgb}
+        device_json = ujson.dumps(device)
+        client.publish(register_pub, device_json)
+        print("Sending ping massage to server " + device_json)
         await asyncio.sleep(15)
 
 
@@ -49,3 +51,5 @@ asyncio.create_task(main_loop())
 asyncio.create_task(ping_loop())
 loop = asyncio.get_event_loop()
 loop.run_forever()
+
+led.off()

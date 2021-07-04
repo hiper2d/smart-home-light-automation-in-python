@@ -1,4 +1,8 @@
+import json
 import time
+from collections import namedtuple
+from datetime import datetime, timedelta
+from types import SimpleNamespace
 from typing import Dict, List
 
 import paho.mqtt.client as mqtt_client
@@ -33,13 +37,12 @@ class MqttClient:
     def _on_message(self, client, userdata, message: mqtt_client.MQTTMessage):
         print(f"Received `{message.payload}` from `{message.topic}`")
         if message.topic == ping_sub:
-            payload = message.payload.decode()
-            [client_id, mac] = payload.split("|")
-            if client_id not in self.devices:
-                print(f"Registering new device {client_id}")
-            self.devices[client_id] = Device(mac, time.time())
+            device: Device = Device.string_payload_to_device(message.payload.decode())
+            if device.id not in self.devices:
+                print(f"Registering new device {device}")
+            self.devices[device.id] = device
             if self.on_device_added:
-                self.on_device_added(client_id)
+                self.on_device_added(device)
 
     def start(self):
         self.client.loop_start()
@@ -51,7 +54,7 @@ class MqttClient:
 
     def send_light_command_to_client(self, device_id: str, msg: str):
         topic = f"home/{device_id}"
-        self.client.publish(f"home/{device_id}", msg)
+        self.client.publish(topic, msg)
         result = self.client.publish(topic, msg)
         status = result[0]
         if status == 0:
@@ -62,19 +65,16 @@ class MqttClient:
     def subscribe_to_ping_messages_from_client(self, topic=ping_sub):
         self.client.subscribe(topic)
 
-    def get_active_client_ids(self) -> List[str]:
-        return [key for key in self.devices.keys()]
-
     def clean_dead_devices(self):
         while True:
             time.sleep(30)
             print(f"Refreshing {len(self.devices.keys())} devices")
             refreshed_devices: Dict[str, Device] = {}
             for device_id, device in self.devices.items():
-                if time.time() - device.time > 30:
+                if (datetime.now() - device.created_at).seconds > 30:
                     print(f"Device {device_id} is offline")
                     if self.on_device_removed:
-                        self.on_device_removed(device_id)
+                        self.on_device_removed(device)
                 else:
                     refreshed_devices[device_id] = device
             self.devices = refreshed_devices

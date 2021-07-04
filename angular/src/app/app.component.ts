@@ -13,8 +13,8 @@ import {Device} from "./model/device";
 })
 export class AppComponent implements OnInit {
 
-  allDevice: string = 'All Devices';
-  devices: Array<string> = [];
+  allDevice: Device = new Device('All Devices', [0, 0, 0]);
+  devices: Array<Device> = [];
 
   constructor(private raspberrypiService: RaspberrypiService, private sseService: SseService) {
   }
@@ -24,15 +24,17 @@ export class AppComponent implements OnInit {
   }
 
   loadDevices() {
-    this.raspberrypiService.getDevices().subscribe(listOfDevices => this.devices = listOfDevices);
+    this.raspberrypiService.getDevices().subscribe(listOfDevices => {
+      this.devices = listOfDevices;
+    });
     this.sseService.getServerSentEvent().subscribe((msg: MessageEvent) => {
       const sseMessageData = JSON.parse(msg.data) as SseData;
-      let index = this.devices.indexOf(sseMessageData.id);
+      let index = this.devices.map(d => d.id).indexOf(sseMessageData.id);
       if (sseMessageData.event == 'remove' && index > -1) {
         this.devices.splice(index, 1)
       } else {
         if (index === -1) {
-          this.devices.push(sseMessageData.id);
+          this.devices.push(sseMessageData);
         }
       }
     });
@@ -43,8 +45,8 @@ export class AppComponent implements OnInit {
     this.raspberrypiService.toggleAll(mqttMessage).subscribe();
   }
 
-  deviceChange(deviceId: string, rgbaCommand: RgbaCommand) {
+  deviceChange(device: Device, rgbaCommand: RgbaCommand) {
     const mqttMessage = MqttMessageUtil.convertRgbaCommandToMqttMessage(rgbaCommand);
-    this.raspberrypiService.toggleOne(deviceId, mqttMessage).subscribe();
+    this.raspberrypiService.toggleOne(device.id, mqttMessage).subscribe();
   }
 }

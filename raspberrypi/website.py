@@ -1,12 +1,13 @@
 import json
-import threading
 import os.path
+import threading
+from typing import List, Union, Dict
 
-from flask import Flask, render_template, request, Response, send_from_directory, make_response, jsonify
+from flask import Flask, render_template, request, Response, make_response, jsonify
 from flask_cors import CORS
 
 from mqtt_client import MqttClient
-from util import MessageAnnouncer
+from util import MessageAnnouncer, Device
 
 template_dir = os.path.abspath('public')
 app = Flask(__name__, template_folder=template_dir, static_url_path='', static_folder=template_dir)
@@ -16,17 +17,17 @@ mqtt_client = MqttClient()
 announcer = MessageAnnouncer()
 
 
-def format_sse(client_id: str, event=None) -> str:
-    msg = {'id': client_id, 'event': event}
+def format_sse(client: Device, event: str = None) -> str:
+    msg = {'id': client.id, 'rgb': client.rgb, 'event': event}
     return json.dumps(msg) + '\n\n'
 
 
-def _on_device_added(device_id: str):
-    announcer.announce(format_sse(client_id=device_id))
+def _on_device_added(client: Device):
+    announcer.announce(format_sse(client=client))
 
 
-def _on_device_removed(device_id: str):
-    announcer.announce(format_sse(client_id=device_id, event='remove'))
+def _on_device_removed(client: Device):
+    announcer.announce(format_sse(client=client, event='remove'))
 
 
 @app.route('/', methods=['GET'])
@@ -36,14 +37,16 @@ def index():
 
 @app.route('/api/device', methods=['GET'])
 def device():
-    return make_response(jsonify(mqtt_client.get_active_client_ids()), 200)
+    devices_as_list: List[Device] = list(mqtt_client.devices.values())
+    devices_as_json: List[Dict[str, Union[List[int]]]] = map(lambda d: d.to_json(), devices_as_list)
+    return make_response(jsonify(devices_as_json), 200)
 
 
 @app.route('/api/toggle/<client_id>', methods=['GET'])
 def toggle_one (client_id: str):
     rgb = request.args.get('rgb')
     mqtt_client.send_light_command_to_client(client_id, rgb)
-    data = {'message': 'Done', 'code': 'SUCCESS'}
+    data = {'message': f'Sent MQTT message to set {rgb} color to {client_id}', 'code': 'SUCCESS'}
     return make_response(jsonify(data), 200)
 
 
@@ -51,7 +54,7 @@ def toggle_one (client_id: str):
 def toggle_all():
     rgb = request.args.get('rgb')
     mqtt_client.send_light_command_to_clients(rgb)
-    data = {'message': 'Done', 'code': 'SUCCESS'}
+    data = {'message': f'Sent MQTT message to set {rgb} color to all devices', 'code': 'SUCCESS'}
     return make_response(jsonify(data), 200)
 
 

@@ -1,26 +1,30 @@
+from __future__ import annotations
+
+import datetime
+import json
 import queue
-from datetime import time
-
-
-class RGBA:
-
-    def __init__(self, r: int, g: int, b: int, a: int):
-        self.r = r
-        self.g = g
-        self.b = b
-        self.a = a
+from typing import Dict, Union, List
 
 
 class Device:
 
-    def __init__(self, id: str, mac: str, rgba: RGBA, timestamp: float):
+    @staticmethod
+    def string_payload_to_device(payload: str) -> Device:
+        device_dict = json.loads(payload)
+        return Device(**device_dict)
+
+    def __init__(self, id: str, mac: str, rgb: [int], timestamp: datetime = datetime.datetime.now()):
         self.id = id
         self.mac = mac
-        self.rgba = rgba
-        self.time = time
+        self.rgb = rgb
+        self.created_at = timestamp
+
+    def to_dict(self) -> Dict['str', Union[str, List[int]]]:
+        return {'id': self.id, 'rgb': self.rgb}
 
     def __repr__(self) -> str:
-        return f"device with mac id {self.id} and mac address {self.mac}, registered at {time.ctime(self.time)}"
+        return f"device with mac id {self.id} and mac address {self.mac}, " \
+               f"registered at {self.created_at.strftime('%Y-%m-%d %H:%M:%S')}"
 
 
 class MessageAnnouncer:

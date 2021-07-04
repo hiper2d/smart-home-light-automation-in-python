@@ -1,30 +1,25 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {ColorEvent} from "ngx-color/color-wrap.component";
 import {ColorSwitcher, RgbaCommand} from "../model/rgba-command";
 import {RGBA} from "ngx-color/helpers/color.interfaces";
+import {Device} from "../model/device";
 
 @Component({
   selector: 'app-device',
   templateUrl: './device.component.html',
   styleUrls: ['./device.component.scss']
 })
-export class DeviceComponent implements OnInit {
+export class DeviceComponent {
 
   static readonly WHITE = new RgbaCommand({on: true}, {r: 255, g: 255, b: 255, a: 1})
   static readonly OFF = new RgbaCommand({on: false}, {r: 0, g: 0, b: 0, a: 0})
 
-  @Input() deviceName?: string;
+  @Input() device?: Device;
   @Output('rgbaChange') emitter = new EventEmitter<RgbaCommand>();
   customColorSwitcher: ColorSwitcher = {on: false};
   customColor: RGBA = {r: 255, g: 255, b: 255, a: 1};
   customColorHex: string = '#fff';
   rgbaCommand: RgbaCommand = new RgbaCommand(this.customColorSwitcher, this.customColor);
-
-  constructor() {
-  }
-
-  ngOnInit(): void {
-  }
 
   modeChange(value: string) {
     switch (value) {
