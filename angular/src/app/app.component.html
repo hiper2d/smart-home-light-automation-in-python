@@ -1,8 +1,7 @@
-<ul>
-  <li>
-    <app-device [device]="allDevice" (rgbaChange)="allDevicesChange($event)"></app-device>
-  </li>
-  <li *ngFor="let device of devices">
-    <app-device [device]="device" (rgbaChange)="deviceChange(device, $event)"></app-device>
-  </li>
-</ul>
+<div [formGroup]="deviceForm">
+  <ul formArrayName="devices">
+    <li *ngFor="let device of devices.controls; let i=index">
+      <app-device [formControlName]="i"></app-device>
+    </li>
+  </ul>
+</div>

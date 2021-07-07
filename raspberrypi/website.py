@@ -38,7 +38,8 @@ def index():
 @app.route('/api/device', methods=['GET'])
 def device():
     devices_as_list: List[Device] = list(mqtt_client.devices.values())
-    devices_as_json: List[Dict[str, Union[List[int]]]] = map(lambda d: d.to_json(), devices_as_list)
+    devices_as_json = list(map(lambda d: d.to_dict(), devices_as_list))
+    print(devices_as_json)
     return make_response(jsonify(devices_as_json), 200)
 
 
@@ -74,7 +75,8 @@ if __name__ == '__main__':
         mqtt_client.start()
         mqtt_client.on_device_added = _on_device_added
         mqtt_client.on_device_removed = _on_device_removed
-        threading.Thread(target=mqtt_client.clean_dead_devices, daemon=True).start()
+        # fixme: something is wrong with this comparison, need to investigate
+        # threading.Thread(target=mqtt_client.clean_dead_devices, daemon=True).start()
         while not mqtt_client.connected:
             pass
     except:

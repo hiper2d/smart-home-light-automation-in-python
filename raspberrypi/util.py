@@ -20,7 +20,7 @@ class Device:
         self.created_at = timestamp
 
     def to_dict(self) -> Dict['str', Union[str, List[int]]]:
-        return {'id': self.id, 'rgb': self.rgb}
+        return {'id': self.id, 'rgb': self.rgb, 'on': True}
 
     def __repr__(self) -> str:
         return f"device with mac id {self.id} and mac address {self.mac}, " \
