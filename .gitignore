@@ -1,2 +1,5 @@
 .idea
 raspberrypi/public
+raspberrypi/__pycache__
+**/.DS_Store
+**/*.iml
