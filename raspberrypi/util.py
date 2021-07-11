@@ -15,17 +15,28 @@ class Device:
         new_device.last_updated_at = datetime.now()
         return new_device
 
-    def __init__(self, id: str, mac: str, rgb: [int], timestamp: datetime = datetime.now()):
+    @staticmethod
+    def dict_payload_to_device(payload_dict: Dict) -> Device:
+        new_device = Device(**payload_dict)
+        new_device.last_updated_at = datetime.now()
+        return new_device
+
+    def __init__(self, id: str, rgb: [int], mac: str = '', on: bool = True, timestamp: datetime = datetime.now()):
         self.id = id
         self.mac = mac
         self.rgb = rgb
+        self.on = on
         self.last_updated_at = timestamp
 
     def to_dict(self) -> Dict['str', Union[str, List[int]]]:
-        return {'id': self.id, 'rgb': self.rgb, 'on': True}
+        return {'id': self.id, 'rgb': self.rgb, 'on': self.on}
+
+    def rgb_str(self):
+        [r, g, b] = self.rgb
+        return f"{r},{g},{b}"
 
     def __repr__(self) -> str:
-        return f"device with mac id {self.id}, mac address {self.mac}, rgb {self.rgb} " \
+        return f"device with mac id {self.id}, on status {self.on}, rgb {self.rgb} " \
                f"last updated at {self.last_updated_at.strftime('%Y-%m-%d %H:%M:%S')}"
 
 

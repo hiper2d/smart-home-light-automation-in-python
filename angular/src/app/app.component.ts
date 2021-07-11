@@ -74,7 +74,7 @@ export class AppComponent implements OnInit {
     if (device.id === ALL_DEVICES_ID) {
       this.raspberrypiService.toggleAll(device.rgb).subscribe(r => console.log(r));
     } else {
-      this.raspberrypiService.toggleOne(device).subscribe(r => console.log(r));
+      this.raspberrypiService.saveDevice(device).subscribe(r => console.log(r));
     }
   }
 }

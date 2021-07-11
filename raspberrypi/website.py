@@ -36,19 +36,19 @@ def index():
 
 
 @app.route('/api/device', methods=['GET'])
-def device():
+def get_devices():
     devices_as_list: List[Device] = list(mqtt_client.devices.values())
     devices_as_json = list(map(lambda d: d.to_dict(), devices_as_list))
     print(devices_as_json)
     return make_response(jsonify(devices_as_json), 200)
 
 
-@app.route('/api/toggle/<client_id>', methods=['GET'])
-def toggle_one (client_id: str):
-    rgb = request.args.get('rgb')
-    mqtt_client.send_light_command_to_client(client_id, rgb)
-    data = {'message': f'Sent MQTT message to set {rgb} color to {client_id}', 'code': 'SUCCESS'}
-    return make_response(jsonify(data), 200)
+@app.route('/api/device', methods=['PUT'])
+def save_device():
+    device: Device = Device.dict_payload_to_device(request.json)
+    mqtt_client.send_light_command_to_client(device.id, device.rgb_str())
+    response_data = {'message': f'Sent MQTT message to set {device.rgb} color to all devices', 'code': 'SUCCESS'}
+    return make_response(jsonify(response_data), 200)
 
 
 @app.route('/api/toggle', methods=['GET'])
