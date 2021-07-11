@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import datetime
+from datetime import datetime
 import json
 import queue
 from typing import Dict, Union, List
@@ -11,20 +11,22 @@ class Device:
     @staticmethod
     def string_payload_to_device(payload: str) -> Device:
         device_dict = json.loads(payload)
-        return Device(**device_dict)
+        new_device = Device(**device_dict)
+        new_device.last_updated_at = datetime.now()
+        return new_device
 
-    def __init__(self, id: str, mac: str, rgb: [int], timestamp: datetime = datetime.datetime.now()):
+    def __init__(self, id: str, mac: str, rgb: [int], timestamp: datetime = datetime.now()):
         self.id = id
         self.mac = mac
         self.rgb = rgb
-        self.created_at = timestamp
+        self.last_updated_at = timestamp
 
     def to_dict(self) -> Dict['str', Union[str, List[int]]]:
         return {'id': self.id, 'rgb': self.rgb, 'on': True}
 
     def __repr__(self) -> str:
-        return f"device with mac id {self.id} and mac address {self.mac}, " \
-               f"registered at {self.created_at.strftime('%Y-%m-%d %H:%M:%S')}"
+        return f"device with mac id {self.id}, mac address {self.mac}, rgb {self.rgb} " \
+               f"last updated at {self.last_updated_at.strftime('%Y-%m-%d %H:%M:%S')}"
 
 
 class MessageAnnouncer:

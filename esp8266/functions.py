@@ -1,5 +1,5 @@
-import time;
-from machine import Pin, PWM;
+import time
+from machine import Pin, PWM
 
 pins = [12, 14, 13]
 

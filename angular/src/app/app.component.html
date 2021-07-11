@@ -1,7 +1,7 @@
 <div [formGroup]="deviceForm">
   <ul formArrayName="devices">
     <li *ngFor="let device of devices.controls; let i=index">
-      <app-device [formControlName]="i"></app-device>
+      <app-device [formControlName]="i" (ngModelChange)="deviceChange($event)"></app-device>
     </li>
   </ul>
 </div>

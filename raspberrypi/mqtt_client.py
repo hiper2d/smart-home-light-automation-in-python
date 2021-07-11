@@ -1,9 +1,6 @@
-import json
 import time
-from collections import namedtuple
-from datetime import datetime, timedelta
-from types import SimpleNamespace
-from typing import Dict, List
+from datetime import datetime
+from typing import Dict
 
 import paho.mqtt.client as mqtt_client
 
@@ -23,7 +20,7 @@ class MqttClient:
         self.client = client
         self.connected = False
         self.devices: Dict[str, Device] = {}
-        self.on_device_added = None
+        self.on_device_updated = None
         self.on_device_removed = None
 
     def _on_connect(self, client, userdata, flags, rc):
@@ -40,21 +37,32 @@ class MqttClient:
             device: Device = Device.string_payload_to_device(message.payload.decode())
             if device.id not in self.devices:
                 print(f"Registering new device {device}")
-            self.devices[device.id] = device
-            if self.on_device_added:
-                self.on_device_added(device)
+                self.devices[device.id] = device
+                if self.on_device_updated:
+                    self.on_device_updated(device, 'add')
+            else:
+                print(f"Updating device: {device}")
+                self.devices[device.id].last_updated_at = device.last_updated_at
+                if self.devices[device.id].rgb[0] != device.rgb[0] or \
+                        self.devices[device.id].rgb[1] != device.rgb[1] or \
+                        self.devices[device.id].rgb[2] != device.rgb[2]:
+                    self.devices[device.id].rgb = device.rgb
+                    if self.on_device_updated:
+                        self.on_device_updated(self.devices[device.id])
 
     def start(self):
         self.client.loop_start()
         self.client.connect(host_ip)
 
     def send_light_command_to_clients(self, msg: str):
-        for device in self.devices.keys():
-            self.send_light_command_to_client(device, msg)
+        for device_id, device in self.devices.items():
+            device.rgb = msg.split(',')
+            self.send_light_command_to_client(device_id, msg)
 
     def send_light_command_to_client(self, device_id: str, msg: str):
         topic = f"home/{device_id}"
         self.client.publish(topic, msg)
+        self.devices[device_id].rgb = msg.split(',')
         result = self.client.publish(topic, msg)
         status = result[0]
         if status == 0:
@@ -71,7 +79,8 @@ class MqttClient:
             print(f"Refreshing {len(self.devices.keys())} devices")
             refreshed_devices: Dict[str, Device] = {}
             for device_id, device in self.devices.items():
-                if (datetime.now() - device.created_at).seconds > 30:
+                print((datetime.now() - device.last_updated_at).seconds)
+                if (datetime.now() - device.last_updated_at).seconds > 30:
                     print(f"Device {device_id} is offline")
                     if self.on_device_removed:
                         self.on_device_removed(device)

@@ -1,5 +1,4 @@
-import {RgbaCommand} from "../model/rgba-command";
-import {RGB, RGBA} from "ngx-color/helpers/color.interfaces";
+import {RGBA} from "ngx-color/helpers/color.interfaces";
 
 const COEFFICIENT = 1023 / 255;
 
@@ -11,15 +10,7 @@ function scaleBack(color: number): number {
   return Math.round(color / COEFFICIENT);
 }
 
-export class MqttMessageUtil {
-
-  static convertRgbaCommandToMqttMessage(command: RgbaCommand): string {
-    const r = command.rgba.r;
-    const g = command.rgba.g;
-    const b = command.rgba.b;
-    const a = command.rgba.a;
-    return `${scale(r,a)},${scale(g,a)},${scale(b,a)}`;
-  }
+export class RgbUtil {
 
   static convertRgbToRgbArray(rgba: RGBA): Array<number> {
     const r = scale(rgba.r, rgba.a);
@@ -30,5 +21,9 @@ export class MqttMessageUtil {
 
   static convertRgbArrayIntoRgba([r, g, b]: Array<number>): RGBA {
     return {r: scaleBack(r), g: scaleBack(g), b: scaleBack(b), a: 1 };
+  }
+
+  static rgbArrayToString([r, g, b]: Array<number>): string {
+    return `${r},${g},${b}`
   }
 }

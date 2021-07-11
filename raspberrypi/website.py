@@ -22,8 +22,8 @@ def format_sse(client: Device, event: str = None) -> str:
     return json.dumps(msg) + '\n\n'
 
 
-def _on_device_added(client: Device):
-    announcer.announce(format_sse(client=client))
+def _on_device_updated(client: Device, event: str = 'update'):
+    announcer.announce(format_sse(client=client, event=event))
 
 
 def _on_device_removed(client: Device):
@@ -73,10 +73,9 @@ if __name__ == '__main__':
     try:
         mqtt_client = MqttClient()
         mqtt_client.start()
-        mqtt_client.on_device_added = _on_device_added
+        mqtt_client.on_device_updated = _on_device_updated
         mqtt_client.on_device_removed = _on_device_removed
-        # fixme: something is wrong with this comparison, need to investigate
-        # threading.Thread(target=mqtt_client.clean_dead_devices, daemon=True).start()
+        threading.Thread(target=mqtt_client.clean_dead_devices, daemon=True).start()
         while not mqtt_client.connected:
             pass
     except:

@@ -3,6 +3,7 @@ import {HttpClient, HttpParams} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {ApiConst} from "../util/api.const";
 import {Device} from "../model/device";
+import {RgbUtil} from "../util/rgb.util";
 
 @Injectable({
   providedIn: 'root'
@@ -15,13 +16,13 @@ export class RaspberrypiService{
     return this.http.get<Array<Device>>(ApiConst.DEVICE);
   }
 
-  toggleOne(deviceId: string, message: string): Observable<any> {
-    const params = new HttpParams().set('rgb', message);
-    return this.http.get(ApiConst.TOGGLE + '/' + deviceId, {params})
+  toggleOne(device: Device): Observable<any> {
+    const params = new HttpParams().set('rgb', RgbUtil.rgbArrayToString(device.rgb));
+    return this.http.get(ApiConst.TOGGLE + '/' + device.id, {params})
   }
 
-  toggleAll(message: string): Observable<any> {
-    const params = new HttpParams().set('rgb', message);
+  toggleAll(rgb: Array<number>): Observable<any> {
+    const params = new HttpParams().set('rgb', RgbUtil.rgbArrayToString(rgb));
     return this.http.get(ApiConst.TOGGLE, {params})
   }
 }

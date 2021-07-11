@@ -3,7 +3,7 @@ import {ColorEvent} from "ngx-color/color-wrap.component";
 import {ColorSwitcher, RgbaCommand} from "../model/rgba-command";
 import {RGBA} from "ngx-color/helpers/color.interfaces";
 import {Device} from "../model/device";
-import {MqttMessageUtil} from "../util/mqtt-message.util";
+import {RgbUtil} from "../util/rgb.util";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
 
 @Component({
@@ -27,6 +27,7 @@ export class DeviceComponent implements OnInit, ControlValueAccessor {
   @Output('rgbaChange') emitter = new EventEmitter<RgbaCommand>();
   customColorSwitcher: ColorSwitcher = {on: false};
   customColor: RGBA = {r: 255, g: 255, b: 255, a: 1};
+  customColorDirty = false;
   customColorHex: string = '#fff';
   rgbaCommand: RgbaCommand = new RgbaCommand(this.customColorSwitcher, this.customColor);
 
@@ -45,8 +46,10 @@ export class DeviceComponent implements OnInit, ControlValueAccessor {
 
   writeValue(obj: Device): void {
     this.device = obj;
+    console.log('Patch value');
+    console.log(obj);
     const [r, g, b] = obj.rgb;
-    this.customColor = MqttMessageUtil.convertRgbArrayIntoRgba([r, g, b]);
+    this.customColor = RgbUtil.convertRgbArrayIntoRgba([r, g, b]);
   }
 
   modeChange(value: string) {
@@ -54,21 +57,25 @@ export class DeviceComponent implements OnInit, ControlValueAccessor {
       case 'custom':
         this.customColorSwitcher.on = true;
         this.emitter.emit(this.rgbaCommand);
-        this.device!.rgb = MqttMessageUtil.convertRgbToRgbArray(this.customColor);
+        if (this.customColorDirty) {
+          this.device!.rgb = RgbUtil.convertRgbToRgbArray(this.customColor);
+          this.onChange(this.device!);
+        }
         break;
       case 'off':
         this.customColorSwitcher.on = false;
         this.emitter.emit(DeviceComponent.OFF);
-        this.device!.rgb = MqttMessageUtil.convertRgbToRgbArray(this.customColor);
+        this.device!.rgb = RgbUtil.convertRgbToRgbArray(this.customColor);
+        this.onChange(this.device!);
         break;
       case 'white':
         this.customColorSwitcher.on = true;
         this.device!.on = true;
         this.customColor = DeviceComponent.WHITE.rgba;
         this.emitter.emit(DeviceComponent.WHITE);
+        this.onChange(this.device!);
         break;
     }
-    this.onChange(this.device!);
   }
 
   rgbChanged(colorEvent: ColorEvent) {
@@ -76,14 +83,16 @@ export class DeviceComponent implements OnInit, ControlValueAccessor {
     this.customColor.g = colorEvent.color.rgb.g;
     this.customColor.b = colorEvent.color.rgb.b;
     this.customColorHex = colorEvent.color.hex;
-    //this.emitter.emit(this.rgbaCommand);
-    //this.onChange();
+    this.device!.rgb = RgbUtil.convertRgbToRgbArray(this.customColor);
+    this.customColorDirty = true;
+    this.onChange(this.device!);
   }
 
   alphaChanged(colorEvent: ColorEvent) {
     this.customColor.a = colorEvent.color.rgb.a;
-    //this.emitter.emit(this.rgbaCommand);
-    //this.onChange();
+    this.device!.rgb = RgbUtil.convertRgbToRgbArray(this.customColor);
+    this.customColorDirty = true;
+    this.onChange(this.device!);
   }
 
   private onChange(device: Device) {

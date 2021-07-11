@@ -3,9 +3,11 @@ import {RaspberrypiService} from "./core/raspberrypi.service";
 import {SseService} from "./core/sse.service";
 import {SseData} from "./model/sse-data";
 import {RgbaCommand} from "./model/rgba-command";
-import {MqttMessageUtil} from "./util/mqtt-message.util";
+import {RgbUtil} from "./util/rgb.util";
 import {Device} from "./model/device";
 import {FormArray, FormBuilder, FormGroup} from "@angular/forms";
+
+const ALL_DEVICES_ID = 'All Devices'
 
 @Component({
   selector: 'app-root',
@@ -15,7 +17,7 @@ import {FormArray, FormBuilder, FormGroup} from "@angular/forms";
 export class AppComponent implements OnInit {
 
   deviceForm: FormGroup;
-  allDevice: Device = new Device('All Devices', true, [0, 0, 0]);
+  allDevice: Device = new Device(ALL_DEVICES_ID, true, [0, 0, 0]);
 
   constructor(
     private raspberrypiService: RaspberrypiService,
@@ -25,8 +27,6 @@ export class AppComponent implements OnInit {
     this.deviceForm = this.fb.group({
       devices: this.fb.array([this.fb.control(this.allDevice)])
     });
-    console.log('devices');
-    this.devices.valueChanges.subscribe(a => console.log(a));
   }
 
   ngOnInit(): void {
@@ -43,26 +43,38 @@ export class AppComponent implements OnInit {
     });
     this.sseService.getServerSentEvent().subscribe((msg: MessageEvent) => {
       const sseMessageData = JSON.parse(msg.data) as SseData;
+      console.log(`Received via SSE`)
+      console.log(sseMessageData)
       let index = this.devices.controls.findIndex(c => c.value.id === sseMessageData.id);
-      if (sseMessageData.event == 'remove' && index > -1) {
-        this.devices.removeAt(index);
-      } else {
-        if (index === -1) {
-          const newDevice = new Device(sseMessageData.id, true, sseMessageData.rgb);
-          this.devices.push(this.fb.control(newDevice));
-        }
+      switch (sseMessageData.event) {
+        case 'remove':
+          if (index > -1) {
+            this.devices.removeAt(index);
+          }
+          break;
+        case 'update':
+          if (index > -1) {
+            let device: Device = this.devices.get('' + index)?.value;
+            device.rgb = sseMessageData.rgb;
+            this.devices.get('' + index)?.patchValue(device);
+          }
+          break;
+        case 'add':
+          if (index === -1) {
+            const newDevice = new Device(sseMessageData.id, true, sseMessageData.rgb);
+            this.devices.push(this.fb.control(newDevice));
+          }
+          break;
       }
     });
   }
 
-  allDevicesChange() {
-    // const mqttMessage = MqttMessageUtil.convertRgbaCommandToMqttMessage(rgbaCommand);
-    // this.raspberrypiService.toggleAll(mqttMessage).subscribe();
-  }
-
-  deviceChange(device: any) {
-    console.log('hey');
-    // const mqttMessage = MqttMessageUtil.convertRgbaCommandToMqttMessage(rgbaCommand);
-    // this.raspberrypiService.toggleOne(device.id, mqttMessage).subscribe();
+  deviceChange(device: Device) {
+    console.log(device);
+    if (device.id === ALL_DEVICES_ID) {
+      this.raspberrypiService.toggleAll(device.rgb).subscribe(r => console.log(r));
+    } else {
+      this.raspberrypiService.toggleOne(device).subscribe(r => console.log(r));
+    }
   }
 }
