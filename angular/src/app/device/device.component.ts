@@ -44,8 +44,6 @@ export class DeviceComponent implements OnInit, ControlValueAccessor {
 
   writeValue(obj: Device): void {
     this.device = obj;
-    console.log('Patch value');
-    console.log(obj);
     const [r, g, b] = obj.rgb;
     this.customColor = RgbUtil.convertRgbArrayIntoRgba([r, g, b]);
   }

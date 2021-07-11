@@ -43,8 +43,6 @@ export class AppComponent implements OnInit {
     });
     this.sseService.getServerSentEvent().subscribe((msg: MessageEvent) => {
       const sseMessageData = JSON.parse(msg.data) as SseData;
-      console.log(`Received via SSE`)
-      console.log(sseMessageData)
       let index = this.devices.controls.findIndex(c => c.value.id === sseMessageData.id);
       switch (sseMessageData.event) {
         case 'remove':
@@ -70,7 +68,6 @@ export class AppComponent implements OnInit {
   }
 
   deviceChange(device: Device) {
-    console.log(device);
     if (device.id === ALL_DEVICES_ID) {
       this.raspberrypiService.toggleAll(device.rgb).subscribe(r => console.log(r));
     } else {

@@ -32,6 +32,7 @@ class Device:
         return {'id': self.id, 'rgb': self.rgb, 'on': self.on}
 
     def rgb_str(self):
+        print(self.rgb)
         [r, g, b] = self.rgb
         return f"{r},{g},{b}"
 

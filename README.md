@@ -127,7 +127,7 @@ mosquitto_sub -h <raspberry_ip> -t "home/abc"
    
 3. Copy all 4 files from the `esp8266` project's directory
 
-## How this all Works
+# How this all Works
 
 Diagram with no text explanation for now about the device register process:
 ![smart light ping](./images/smart_light_ping.png)
