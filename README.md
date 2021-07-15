@@ -45,7 +45,7 @@ Raspberry hosts Mosquitto MQTT message broker and Python webserver. There for ne
     # where <raspberry_ip> is the IP address of Raspberry or 'localhost'
     ```
    
-    All devices will send an information about their status here avery 15 seconds.
+    All devices will send an information about their status here every 15 seconds.
     To send a message to the topic from a terminal use the command:
    
     ```bash
@@ -91,23 +91,23 @@ Raspberry hosts Mosquitto MQTT message broker and Python webserver. There for ne
    
    # Add Raspberry Pi IP address to mqtt_client.py file
    hostname -I
-   nano website.py
+   nano mqtt_client.py
    # replace <raspberry_ip> with the real IP
    
    # start webserver on port 5000
    python3 website.py
    ```
     
-Open the address [http://<raspberry_ip>:5000/](http://<raspberry_ip>:5000/) You should see a webpage with no devices except the 'All Devices' control.
+Open the address [http://<raspberry_ip>:5000/](http://<raspberry_ip>:5000/). You should see a webpage with no devices except the 'All Devices' control.
 
-Simulate a new device ping message, to the webserver can pick it up:
+Simulate a new device ping message, so the webserver can pick it up:
 
 ```bash
 mosquitto_pub -h <raspberry_ip> -t "home/ping" -m '{"mac": "0", "id": "abc", "rgb": [0, 1023, 61]}'
  ```
-New device should appear on the webpage. Since it doesn't send ping messges regularry, the webserver will consider it as inactive in 60 seconds and remove from the webpage.
+New device should appear on the webpage. If it doesn't send ping messages regularly, the webserver will consider it as inactive in 60 seconds and remove from the webpage.
 
-While the device in on the webpage, you can control it. To monitor messages from the frontend to devices you can subscribe to the device topic:
+While the device is on the webpage, you can control it. To monitor messages from the frontend to devices you can subscribe to the device topic:
 
 ```bash
 mosquitto_sub -h <raspberry_ip> -t "home/abc"
@@ -115,7 +115,7 @@ mosquitto_sub -h <raspberry_ip> -t "home/abc"
 
 ### ESP8266
 
-1. Use the [official guide](https://docs.micropython.org/en/v1.14/esp8266/tutorial/intro.html) of installing MicroPython to ESP8266. Finding a serial port may be tricky. Before connecting the ESP8266 to Raspberry Pi run the following:
+1. Use the [official guide](https://docs.micropython.org/en/v1.14/esp8266/tutorial/intro.html) of installing MicroPython to a ESP8266. Finding a serial port may be tricky. Before connecting the ESP8266 to Raspberry Pi run the following:
 
    ```bash
    ls -l /dev/ttyUSB*
