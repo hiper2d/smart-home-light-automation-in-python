@@ -144,4 +144,5 @@ mosquitto_sub -h <raspberry_ip> -t "home/abc"
 # How this all Works
 
 Diagram with no text explanation for now about the device register process:
+
 ![smart light ping](./images/smart_light_ping.png)
