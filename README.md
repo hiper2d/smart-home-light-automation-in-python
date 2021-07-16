@@ -127,6 +127,20 @@ mosquitto_sub -h <raspberry_ip> -t "home/abc"
    
 3. Copy all 4 files from the `esp8266` project's directory
 
+# Circuit diagram
+
+![circuit diagram](./images/circuit_diagram.jpg)
+
+### List of components
+
+1. 1 x ESP8266 NodeMCU development board
+2. 1 x SMD 5050 RGB LED strip - 1
+3. 3 x TIP120 NPN transistor
+4. 3 x 180-240 Ohm resistor
+5. 1 x Mini-360 DC-DC buck converter
+6. 1 x 1N914 switching diode
+7. 1 x 12V 3A power supply
+
 # How this all Works
 
 Diagram with no text explanation for now about the device register process:
