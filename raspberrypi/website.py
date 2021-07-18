@@ -54,7 +54,8 @@ def save_device():
 @app.route('/api/toggle', methods=['GET'])
 def toggle_all():
     rgba = request.args.get('rgba')
-    mqtt_client.send_light_command_to_clients(rgba)
+    on = True if request.args.get('on') == 'true' else False
+    mqtt_client.send_light_command_to_clients(on, rgba)
     data = {'message': f'Sent MQTT message to set {rgba} color to all devices', 'code': 'SUCCESS'}
     return make_response(jsonify(data), 200)
 

@@ -24,8 +24,8 @@ register_pub = "home/ping"
 scale_coefficient: float = 1023 / 255
 led = Pin(2, Pin.OUT)
 brightness: float = 1.0
-on = True
 rgb = functions.get_colors()
+on = False if rgb == [0, 0, 0] else True
 r = upscale(rgb[0])
 g = upscale(rgb[1])
 b = upscale(rgb[2])
@@ -42,7 +42,7 @@ def light_message_callback(topic: str, msg: bytes):
     g = int(g_str)
     b = int(b_str)
     brightness = float(a_str)
-    if r == 0 and g == 0 and b == 0:
+    if (r == 0 and g == 0 and b == 0) or on is False:
         functions.all_off()
         led.on()
     else:

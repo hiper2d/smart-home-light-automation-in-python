@@ -50,6 +50,7 @@ export class AppComponent implements OnInit {
           if (index > -1) {
             let device: Device = this.devices.get('' + index)?.value;
             device.rgba = sse_device.rgba;
+            device.on = sse_device.on;
             this.devices.get('' + index)?.patchValue(device);
           }
           break;
@@ -64,9 +65,9 @@ export class AppComponent implements OnInit {
 
   deviceChange(device: Device) {
     if (device.id === Const.ALL_DEVICES_ID) {
-      this.raspberrypiService.toggleAll(device.rgba).subscribe(r => console.log(r));
+      this.raspberrypiService.toggleAll(device.on, device.rgba).subscribe();
     } else {
-      this.raspberrypiService.saveDevice(device).subscribe(r => console.log(r));
+      this.raspberrypiService.saveDevice(device).subscribe();
     }
   }
 }

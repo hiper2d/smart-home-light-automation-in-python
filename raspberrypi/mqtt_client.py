@@ -43,28 +43,27 @@ class MqttClient:
             else:
                 local_device = self.devices[remote_device.id]
                 local_device.last_updated_at = remote_device.last_updated_at
-                if local_device.on != remote_device.on:
-                    print('Updating device: on/off state')
-                    local_device.on = remote_device.on
-                    local_device.rgba = remote_device.rgba
-                    if self.on_device_updated:
-                        self.on_device_updated(local_device)
-                elif local_device.on is True:
-                    if local_device.rgba[0] != remote_device.rgba[0] or \
-                            local_device.rgba[1] != remote_device.rgba[1] or \
-                            local_device.rgba[2] != remote_device.rgba[2]:
-                        print('Updating device: color')
-                        local_device.rgba = remote_device.rgba
-                        if self.on_device_updated:
-                            self.on_device_updated(local_device)
+                print(f"{local_device.on} vs {remote_device.on}")
+                if local_device.on != remote_device.on or \
+                        local_device.rgba[0] != remote_device.rgba[0] or \
+                        local_device.rgba[1] != remote_device.rgba[1] or \
+                        local_device.rgba[2] != remote_device.rgba[2]:
+                    self.__sync_devices_when_updating(local_device, remote_device)
+
+    def __sync_devices_when_updating(self, local_device: Device, remote_device: Device):
+        local_device.on = remote_device.on
+        local_device.rgba = remote_device.rgba
+        if self.on_device_updated:
+            self.on_device_updated(local_device)
 
     def start(self):
         self.client.loop_start()
         self.client.connect(host_ip)
 
-    def send_light_command_to_clients(self, rgba_str: str):
+    def send_light_command_to_clients(self, on: bool, rgba_str: str):
         for device_id, device in self.devices.items():
             device.rgba = rgba_str.split(',')
+            device.on = on
             self.send_light_command_to_client(device_id, device)
 
     def send_light_command_to_client(self, device_id: str, device: Device):

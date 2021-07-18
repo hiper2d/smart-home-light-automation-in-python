@@ -58,6 +58,8 @@ export class DeviceComponent implements OnInit, ControlValueAccessor {
         this.customColorHex = RgbUtil.rgbToHex(this.customColor);
         this.customColorDirty = true;
       }
+    } else {
+      this.mode = 'off';
     }
   }
 
