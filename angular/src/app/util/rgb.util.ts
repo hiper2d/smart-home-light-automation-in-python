@@ -12,18 +12,24 @@ function scaleBack(color: number): number {
 
 export class RgbUtil {
 
-  static convertRgbToRgbArray(rgba: RGBA): Array<number> {
-    const r = scale(rgba.r, rgba.a);
-    const g = scale(rgba.g, rgba.a);
-    const b = scale(rgba.b, rgba.a);
-    return [r, g, b];
+  static convertRgbaToArray(rgba: RGBA): Array<number> {
+    return [rgba.r, rgba.g, rgba.b, rgba.a];
   }
 
-  static convertRgbArrayIntoRgba([r, g, b]: Array<number>): RGBA {
-    return {r: scaleBack(r), g: scaleBack(g), b: scaleBack(b), a: 1 };
+  static convertArrayToRgba([r, g, b, a]: Array<number>): RGBA {
+    return {r: r, g: g, b: b, a: a };
   }
 
-  static rgbArrayToString([r, g, b]: Array<number>): string {
-    return `${r},${g},${b}`
+  static rgbArrayToString([r, g, b, a]: Array<number>): string {
+    return `${r},${g},${b},${a}`
+  }
+
+  static rgbToHex(rgba: RGBA) {
+    return "#" + this.numberToHex(rgba.r) + this.numberToHex(rgba.g) + this.numberToHex(rgba.b);
+  }
+
+  private static numberToHex(c: number) {
+    var hex = c.toString(16);
+    return hex.length == 1 ? "0" + hex : hex;
   }
 }

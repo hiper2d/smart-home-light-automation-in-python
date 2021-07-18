@@ -13,33 +13,47 @@ mac = ubinascii.hexlify(network.WLAN().config('mac'),':')
 print("Started device with client id " + client_id.decode() + " and mac: " + mac.decode())
 register_pub = "home/ping"
 led = Pin(2, Pin.OUT)
+brightness: float = 1.0
+on = True
+[r,g,b] = functions.get_colors()
 
 
 def light_message_callback(topic: str, msg: bytes):
-    print("Received message from server: " + msg.decode())
-    [r, g, b] = msg.decode().split(',')
-    if r == '0' and g == '0' and b == '0':
+    global r, g, b, brightness, on
+    json = msg.decode()
+    print("Received message from server: " + json)
+    dict_from_json = ujson.loads(json)
+    on = dict_from_json['on']
+    [r_str, g_str, b_str, a_str] = dict_from_json['rgba']
+    r = int(r_str)
+    g = int(g_str)
+    b = int(b_str)
+    brightness = float(a_str)
+    if r == 0 and g == 0 and b == 0:
         functions.all_off()
         led.on()
     else:
-        functions.choose_color(int(r), int(g), int(b))
+        functions.choose_color(r, g, b)
         led.off()
+    publish()
 
 
 async def main_loop():
     while True:
         client.check_msg()
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.2)
 
 
 async def ping_loop():
     while True:
-        rgb = functions.get_colors()
-        device = {'id': client_id, 'mac': mac, 'rgb': rgb}
-        device_json = ujson.dumps(device)
-        client.publish(register_pub, device_json)
-        print("Sending ping massage to server " + device_json)
+        publish()
         await asyncio.sleep(15)
+
+def publish():
+    device = {'id': client_id, 'on': on, 'mac': mac, 'rgba': [r,g,b,brightness]}
+    device_json = ujson.dumps(device)
+    client.publish(register_pub, device_json)
+    print("Sending ping massage to server " + device_json)
 
 
 client = MQTTClient(client_id, mqtt_server)

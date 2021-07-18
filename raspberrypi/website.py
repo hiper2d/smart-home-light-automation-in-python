@@ -18,8 +18,9 @@ announcer = MessageAnnouncer()
 
 
 def format_sse(client: Device, event: str = None) -> str:
-    msg = {'id': client.id, 'rgb': client.rgb, 'event': event}
-    return json.dumps(msg) + '\n\n'
+    device_dict = client.to_dict()
+    device_dict['event'] = event
+    return json.dumps(device_dict) + '\n\n'
 
 
 def _on_device_updated(client: Device, event: str = 'update'):
@@ -39,23 +40,22 @@ def index():
 def get_devices():
     devices_as_list: List[Device] = list(mqtt_client.devices.values())
     devices_as_json = list(map(lambda d: d.to_dict(), devices_as_list))
-    print(devices_as_json)
     return make_response(jsonify(devices_as_json), 200)
 
 
 @app.route('/api/device', methods=['PUT'])
 def save_device():
     device: Device = Device.dict_payload_to_device(request.json)
-    mqtt_client.send_light_command_to_client(device.id, device.rgb_str())
-    response_data = {'message': f'Sent MQTT message to set {device.rgb} color to all devices', 'code': 'SUCCESS'}
+    mqtt_client.send_light_command_to_client(device.id, device)
+    response_data = {'message': f'Sent MQTT message to set {device.rgba} color to {device.id}', 'code': 'SUCCESS'}
     return make_response(jsonify(response_data), 200)
 
 
 @app.route('/api/toggle', methods=['GET'])
 def toggle_all():
-    rgb = request.args.get('rgb')
-    mqtt_client.send_light_command_to_clients(rgb)
-    data = {'message': f'Sent MQTT message to set {rgb} color to all devices', 'code': 'SUCCESS'}
+    rgba = request.args.get('rgba')
+    mqtt_client.send_light_command_to_clients(rgba)
+    data = {'message': f'Sent MQTT message to set {rgba} color to all devices', 'code': 'SUCCESS'}
     return make_response(jsonify(data), 200)
 
 

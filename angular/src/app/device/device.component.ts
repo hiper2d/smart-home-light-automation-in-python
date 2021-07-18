@@ -1,10 +1,13 @@
-import {Component, EventEmitter, forwardRef, OnInit, Output} from '@angular/core';
+import {Component, forwardRef, OnInit, Output} from '@angular/core';
 import {ColorEvent} from "ngx-color/color-wrap.component";
-import {ColorSwitcher, RgbaCommand} from "../model/rgba-command";
-import {RGBA} from "ngx-color/helpers/color.interfaces";
+import {RGBA, Color} from "ngx-color/helpers/color.interfaces";
 import {Device} from "../model/device";
 import {RgbUtil} from "../util/rgb.util";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
+import { EventEmitter } from '@angular/core';
+
+const WHITE = {r: 255, g: 255, b: 255, a: 1.0}
+const WHITE_HEX = '#fff'
 
 @Component({
   selector: 'app-device',
@@ -20,14 +23,14 @@ import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
 })
 export class DeviceComponent implements OnInit, ControlValueAccessor {
 
-  static readonly WHITE = {r: 255, g: 255, b: 255, a: 1}
-  static readonly OFF = {r: 0, g: 0, b: 0, a: 0}
 
+
+  @Output('manualChange') deviceEmitter = new EventEmitter<Device>();
   device: Device | undefined;
-  customColorSwitcher: ColorSwitcher = {on: false};
-  customColor: RGBA = {r: 255, g: 255, b: 255, a: 1};
+  mode: 'white'|'off'|'custom' = 'off';
+  customColor: RGBA = {r: 255, g: 255, b: 255, a: 1.0};
   customColorDirty = false;
-  customColorHex: string = '#fff';
+  customColorHex = WHITE_HEX;
 
   ngOnInit(): void {
   }
@@ -44,28 +47,44 @@ export class DeviceComponent implements OnInit, ControlValueAccessor {
 
   writeValue(obj: Device): void {
     this.device = obj;
-    const [r, g, b] = obj.rgb;
-    this.customColor = RgbUtil.convertRgbArrayIntoRgba([r, g, b]);
+    const [r, g, b, a] = obj.rgba;
+    this.customColor = RgbUtil.convertArrayToRgba([r, g, b, a]);
+    if (this.device?.on) {
+      if(this.customColor.r === 255 && this.customColor.g === 255 && this.customColor.b === 255) {
+        this.mode = 'white'
+        this.customColorHex = WHITE_HEX;
+        this.customColorDirty = false;
+      } else {
+        this.mode = 'custom';
+        this.customColorHex = RgbUtil.rgbToHex(this.customColor);
+        this.customColorDirty = true;
+      }
+    }
   }
+
+
 
   modeChange(value: string) {
     switch (value) {
       case 'custom':
-        this.customColorSwitcher.on = true;
+        this.device!.on = true;
         if (this.customColorDirty) {
-          this.device!.rgb = RgbUtil.convertRgbToRgbArray(this.customColor);
+          this.device!.rgba = RgbUtil.convertRgbaToArray(this.customColor);
+          this.deviceEmitter.emit(this.device);
           this.onChange(this.device!);
         }
         break;
       case 'off':
-        this.customColorSwitcher.on = false;
-        this.device!.rgb = RgbUtil.convertRgbToRgbArray(this.customColor);
+        this.device!.on = false;
+        this.deviceEmitter.emit(this.device);
         this.onChange(this.device!);
         break;
       case 'white':
-        this.customColorSwitcher.on = true;
         this.device!.on = true;
-        this.customColor = DeviceComponent.WHITE;
+        this.customColor = WHITE;
+        this.customColorHex = WHITE_HEX
+        this.device!.rgba = RgbUtil.convertRgbaToArray(WHITE);
+        this.deviceEmitter.emit(this.device);
         this.onChange(this.device!);
         break;
     }
@@ -76,16 +95,30 @@ export class DeviceComponent implements OnInit, ControlValueAccessor {
     this.customColor.g = colorEvent.color.rgb.g;
     this.customColor.b = colorEvent.color.rgb.b;
     this.customColorHex = colorEvent.color.hex;
-    this.device!.rgb = RgbUtil.convertRgbToRgbArray(this.customColor);
-    this.customColorDirty = true;
-    this.onChange(this.device!);
+    this.deviceChanged();
   }
 
   alphaChanged(colorEvent: ColorEvent) {
     this.customColor.a = colorEvent.color.rgb.a;
-    this.device!.rgb = RgbUtil.convertRgbToRgbArray(this.customColor);
+    this.deviceChanged();
+  }
+
+  private deviceChanged() {
+    this.device!.rgba = RgbUtil.convertRgbaToArray(this.customColor);
+    this.customColor = {...this.customColor};
     this.customColorDirty = true;
     this.onChange(this.device!);
+    this.deviceEmitter.emit(this.device);
+  }
+
+  getDeviceValue(device?: Device) {
+    if (!device || !device.on) {
+      return 'off';
+    }
+    if (device.rgba[0] === 255 && device.rgba[1] === 255 && device.rgba[2] === 255) {
+      return 'white';
+    }
+    return 'custom';
   }
 
   private onChange(device: Device) {

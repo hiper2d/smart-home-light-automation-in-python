@@ -13,13 +13,13 @@ def pwm_change(pin, brightness, delay):
 
 
 def all_on():
-    for elements in pins:
-        pwm_change(elements, max_brightness, 10)
+    for i in range(0, 3):
+        pwm_change(pins[i], max_brightness, 10)
 
 
 def all_off():
-    for elements in pins:
-        pwm_change(elements, min_brightness, 10)
+    for i in range(0, 3):
+        pwm_change(pins[i], min_brightness, 10)
 
 
 def all_fade_on():
@@ -60,4 +60,3 @@ def choose_color(r, g, b):
 
 def get_colors() -> [str, str, str]:
     return [PWM(Pin(pins[0])).duty(), PWM(Pin(pins[1])).duty(), PWM(Pin(pins[2])).duty()]
-

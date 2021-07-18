@@ -2,7 +2,8 @@ export class Device {
   constructor(
     public id: string,
     public on: boolean = false,
-    public rgb: Array<number>
+    public rgba: Array<number>,
+    public event? : string
   ) {
   }
 }

@@ -34,39 +34,48 @@ class MqttClient:
     def _on_message(self, client, userdata, message: mqtt_client.MQTTMessage):
         print(f"Received `{message.payload}` from `{message.topic}`")
         if message.topic == ping_sub:
-            device: Device = Device.string_payload_to_device(message.payload.decode())
-            if device.id not in self.devices:
-                print(f"Registering new device {device}")
-                self.devices[device.id] = device
+            remote_device: Device = Device.string_payload_to_device(message.payload.decode())
+            if remote_device.id not in self.devices:
+                print(f"Registering new device {remote_device}")
+                self.devices[remote_device.id] = remote_device
                 if self.on_device_updated:
-                    self.on_device_updated(device, 'add')
+                    self.on_device_updated(remote_device, 'add')
             else:
-                print(f"Updating device: {device}")
-                self.devices[device.id].last_updated_at = device.last_updated_at
-                if self.devices[device.id].rgb[0] != device.rgb[0] or \
-                        self.devices[device.id].rgb[1] != device.rgb[1] or \
-                        self.devices[device.id].rgb[2] != device.rgb[2]:
-                    self.devices[device.id].rgb = device.rgb
+                local_device = self.devices[remote_device.id]
+                local_device.last_updated_at = remote_device.last_updated_at
+                if local_device.on != remote_device.on:
+                    print('Updating device: on/off state')
+                    local_device.on = remote_device.on
+                    local_device.rgba = remote_device.rgba
                     if self.on_device_updated:
-                        self.on_device_updated(self.devices[device.id])
+                        self.on_device_updated(local_device)
+                elif local_device.on is True:
+                    if local_device.rgba[0] != remote_device.rgba[0] or \
+                            local_device.rgba[1] != remote_device.rgba[1] or \
+                            local_device.rgba[2] != remote_device.rgba[2]:
+                        print('Updating device: color')
+                        local_device.rgba = remote_device.rgba
+                        if self.on_device_updated:
+                            self.on_device_updated(local_device)
 
     def start(self):
         self.client.loop_start()
         self.client.connect(host_ip)
 
-    def send_light_command_to_clients(self, msg: str):
+    def send_light_command_to_clients(self, rgba_str: str):
         for device_id, device in self.devices.items():
-            device.rgb = msg.split(',')
-            self.send_light_command_to_client(device_id, msg)
+            device.rgba = rgba_str.split(',')
+            self.send_light_command_to_client(device_id, device)
 
-    def send_light_command_to_client(self, device_id: str, msg: str):
+    def send_light_command_to_client(self, device_id: str, device: Device):
         topic = f"home/{device_id}"
-        self.client.publish(topic, msg)
-        self.devices[device_id].rgb = msg.split(',')
-        result = self.client.publish(topic, msg)
+        self.devices[device_id].rgba = device.rgba
+        self.devices[device_id].on = device.on
+        device_json = device.to_json()
+        result = self.client.publish(topic, device_json)
         status = result[0]
         if status == 0:
-            print(f"Send `{msg}` to topic `{topic}`")
+            print(f"Send `{device_json}` to topic `{topic}`")
         else:
             print(f"Failed to send message to topic {topic}")
 
@@ -79,7 +88,6 @@ class MqttClient:
             print(f"Refreshing {len(self.devices.keys())} devices")
             refreshed_devices: Dict[str, Device] = {}
             for device_id, device in self.devices.items():
-                print((datetime.now() - device.last_updated_at).seconds)
                 if (datetime.now() - device.last_updated_at).seconds > 30:
                     print(f"Device {device_id} is offline")
                     if self.on_device_removed:

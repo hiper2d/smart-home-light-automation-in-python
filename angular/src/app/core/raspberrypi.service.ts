@@ -20,8 +20,8 @@ export class RaspberrypiService{
     return this.http.put<Device>(ApiConst.DEVICE, device);
   }
 
-  toggleAll(rgb: Array<number>): Observable<any> {
-    const params = new HttpParams().set('rgb', RgbUtil.rgbArrayToString(rgb));
+  toggleAll(rgba: Array<number>): Observable<any> {
+    const params = new HttpParams().set('rgba', RgbUtil.rgbArrayToString(rgba));
     return this.http.get(ApiConst.TOGGLE, {params})
   }
 }
