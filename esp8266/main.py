@@ -6,16 +6,29 @@ import ubinascii
 import uasyncio as asyncio
 import functions
 
+
+def scale(num: int) -> int:
+    return int(num * scale_coefficient * brightness) + 1
+
+
+def upscale(num: int) -> int:
+    return int((num - 1) / scale_coefficient / brightness)
+
+
 mqtt_server = '192.168.1.36'
 
 client_id = ubinascii.hexlify(machine.unique_id())
 mac = ubinascii.hexlify(network.WLAN().config('mac'),':')
 print("Started device with client id " + client_id.decode() + " and mac: " + mac.decode())
 register_pub = "home/ping"
+scale_coefficient: float = 1023 / 255
 led = Pin(2, Pin.OUT)
 brightness: float = 1.0
 on = True
-[r,g,b] = functions.get_colors()
+rgb = functions.get_colors()
+r = upscale(rgb[0])
+g = upscale(rgb[1])
+b = upscale(rgb[2])
 
 
 def light_message_callback(topic: str, msg: bytes):
@@ -33,7 +46,8 @@ def light_message_callback(topic: str, msg: bytes):
         functions.all_off()
         led.on()
     else:
-        functions.choose_color(r, g, b)
+        print([scale(r), scale(g), scale(b)])
+        functions.choose_color(scale(r), scale(g), scale(b))
         led.off()
     publish()
 
@@ -48,6 +62,7 @@ async def ping_loop():
     while True:
         publish()
         await asyncio.sleep(15)
+
 
 def publish():
     device = {'id': client_id, 'on': on, 'mac': mac, 'rgba': [r,g,b,brightness]}

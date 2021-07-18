@@ -3,8 +3,7 @@ import {RaspberrypiService} from "./core/raspberrypi.service";
 import {SseService} from "./core/sse.service";
 import {Device} from "./model/device";
 import {FormArray, FormBuilder, FormGroup} from "@angular/forms";
-
-const ALL_DEVICES_ID = 'All Devices'
+import {Const} from "./util/const";
 
 @Component({
   selector: 'app-root',
@@ -14,7 +13,7 @@ const ALL_DEVICES_ID = 'All Devices'
 export class AppComponent implements OnInit {
 
   deviceForm: FormGroup;
-  allDevice: Device = new Device(ALL_DEVICES_ID, false, [255, 255, 255, 1]);
+  allDevice: Device = new Device(Const.ALL_DEVICES_ID, true, [255, 255, 255, 1]);
 
   constructor(
     private raspberrypiService: RaspberrypiService,
@@ -51,7 +50,7 @@ export class AppComponent implements OnInit {
           if (index > -1) {
             let device: Device = this.devices.get('' + index)?.value;
             device.rgba = sse_device.rgba;
-            this.devices.get('' + index)?.patchValue(device, { emitEvent: false, onlySelf: true });
+            this.devices.get('' + index)?.patchValue(device);
           }
           break;
         case 'add':
@@ -64,7 +63,7 @@ export class AppComponent implements OnInit {
   }
 
   deviceChange(device: Device) {
-    if (device.id === ALL_DEVICES_ID) {
+    if (device.id === Const.ALL_DEVICES_ID) {
       this.raspberrypiService.toggleAll(device.rgba).subscribe(r => console.log(r));
     } else {
       this.raspberrypiService.saveDevice(device).subscribe(r => console.log(r));

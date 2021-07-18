@@ -1,14 +1,6 @@
 import {RGBA} from "ngx-color/helpers/color.interfaces";
 
-const COEFFICIENT = 1023 / 255;
 
-function scale(color: number, brightness: number): number {
-  return Math.round(color * COEFFICIENT * brightness);
-}
-
-function scaleBack(color: number): number {
-  return Math.round(color / COEFFICIENT);
-}
 
 export class RgbUtil {
 

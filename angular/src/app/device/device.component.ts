@@ -1,13 +1,10 @@
-import {Component, forwardRef, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, forwardRef, OnInit, Output} from '@angular/core';
 import {ColorEvent} from "ngx-color/color-wrap.component";
-import {RGBA, Color} from "ngx-color/helpers/color.interfaces";
+import {RGBA} from "ngx-color/helpers/color.interfaces";
 import {Device} from "../model/device";
 import {RgbUtil} from "../util/rgb.util";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
-import { EventEmitter } from '@angular/core';
-
-const WHITE = {r: 255, g: 255, b: 255, a: 1.0}
-const WHITE_HEX = '#fff'
+import {Const} from "../util/const";
 
 @Component({
   selector: 'app-device',
@@ -23,14 +20,12 @@ const WHITE_HEX = '#fff'
 })
 export class DeviceComponent implements OnInit, ControlValueAccessor {
 
-
-
   @Output('manualChange') deviceEmitter = new EventEmitter<Device>();
   device: Device | undefined;
-  mode: 'white'|'off'|'custom' = 'off';
+  mode?: string = 'off';
   customColor: RGBA = {r: 255, g: 255, b: 255, a: 1.0};
   customColorDirty = false;
-  customColorHex = WHITE_HEX;
+  customColorHex = Const.WHITE_HEX;
 
   ngOnInit(): void {
   }
@@ -49,10 +44,14 @@ export class DeviceComponent implements OnInit, ControlValueAccessor {
     this.device = obj;
     const [r, g, b, a] = obj.rgba;
     this.customColor = RgbUtil.convertArrayToRgba([r, g, b, a]);
+    if (this.device!.id === Const.ALL_DEVICES_ID) {
+      this.mode = undefined;
+      return;
+    }
     if (this.device?.on) {
       if(this.customColor.r === 255 && this.customColor.g === 255 && this.customColor.b === 255) {
         this.mode = 'white'
-        this.customColorHex = WHITE_HEX;
+        this.customColorHex = Const.WHITE_HEX;
         this.customColorDirty = false;
       } else {
         this.mode = 'custom';
@@ -62,9 +61,8 @@ export class DeviceComponent implements OnInit, ControlValueAccessor {
     }
   }
 
-
-
   modeChange(value: string) {
+    this.mode = value;
     switch (value) {
       case 'custom':
         this.device!.on = true;
@@ -81,9 +79,9 @@ export class DeviceComponent implements OnInit, ControlValueAccessor {
         break;
       case 'white':
         this.device!.on = true;
-        this.customColor = WHITE;
-        this.customColorHex = WHITE_HEX
-        this.device!.rgba = RgbUtil.convertRgbaToArray(WHITE);
+        this.customColor = {...Const.WHITE};
+        this.customColorHex = Const.WHITE_HEX;
+        this.device!.rgba = RgbUtil.convertRgbaToArray(Const.WHITE);
         this.deviceEmitter.emit(this.device);
         this.onChange(this.device!);
         break;
@@ -109,16 +107,6 @@ export class DeviceComponent implements OnInit, ControlValueAccessor {
     this.customColorDirty = true;
     this.onChange(this.device!);
     this.deviceEmitter.emit(this.device);
-  }
-
-  getDeviceValue(device?: Device) {
-    if (!device || !device.on) {
-      return 'off';
-    }
-    if (device.rgba[0] === 255 && device.rgba[1] === 255 && device.rgba[2] === 255) {
-      return 'white';
-    }
-    return 'custom';
   }
 
   private onChange(device: Device) {
