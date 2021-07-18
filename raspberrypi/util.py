@@ -17,7 +17,6 @@ class Device:
 
     @staticmethod
     def dict_payload_to_device(payload_dict: Dict) -> Device:
-        print(payload_dict)
         new_device = Device(**payload_dict)
         new_device.last_updated_at = datetime.now()
         return new_device

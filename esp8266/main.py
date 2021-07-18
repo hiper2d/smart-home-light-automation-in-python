@@ -46,7 +46,6 @@ def light_message_callback(topic: str, msg: bytes):
         functions.all_off()
         led.on()
     else:
-        print([scale(r), scale(g), scale(b)])
         functions.choose_color(scale(r), scale(g), scale(b))
         led.off()
     publish()
