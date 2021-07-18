@@ -84,6 +84,7 @@ export class DeviceComponent implements OnInit, ControlValueAccessor {
         this.customColor = {...Const.WHITE};
         this.customColorHex = Const.WHITE_HEX;
         this.device!.rgba = RgbUtil.convertRgbaToArray(Const.WHITE);
+        this.customColorDirty = false;
         this.deviceEmitter.emit(this.device);
         this.onChange(this.device!);
         break;
