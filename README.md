@@ -28,6 +28,15 @@ I've decided to continue deloping this project with some redesign:
 This is how the web interface looks like for now:
 ![interface](./images/interface.png)
 
+# Installation
+
+### k3s
+
+[Here](https://www.youtube.com/watch?v=rOXkutK8ANc) is pretty good video of how to install k3s t Raspberi Pi. I use same Raspberry server as a master and a node. Below are intallations steps:
+1. Enable cgroups on Raspberry
+2. Download k3s as per it's [Quick Start](https://docs.k3s.io/quick-start) guide and install master and node on Raspberry (1-node cluster).
+3. Configure the remote connection from working machine to the k3s cluster
+
 # Setup
 
 ### Raspberry Pi
