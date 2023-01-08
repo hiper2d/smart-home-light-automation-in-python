@@ -10,12 +10,13 @@ I've decided to continue deloping this project with some redesign:
 - I want to split the backend web service into several: ping service to accept ping messages from devices, command seervice to send commands to devices controlled by UI, confige servers to provide groups and device configurations to devices, maybe something else
 - I've decided to rewrite the backend from Python to Kotlin. Python will remain the programming language for devices
 
-The goal of this project:
+### Goals
 * Design devices (hardware and firmware) that can be controlled over a web application in a home WiFi network
 * Each device based on ESP8266 WiFi module
 * Raspberry Pi 4 server to control devices and to host a web client
 
-This project consists of the following:
+### Project structure
+
 * ESP8266 firmware in MicroPython for devices
 * SMD5050 RGB LED Strip Lights as controlled devices
 * Website in Angular 12 server by Python/Flask webserver hosted on Raspberry Pi server to control devices
