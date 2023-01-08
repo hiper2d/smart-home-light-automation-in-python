@@ -35,7 +35,7 @@ This is how the web interface looks like for now:
 [Here](https://www.youtube.com/watch?v=rOXkutK8ANc) is pretty good video of how to install k3s t Raspberi Pi. I use same Raspberry server as a master and a node. Below are intallations steps:
 1. Enable cgroups on Raspberry
 2. Download k3s as per it's [Quick Start](https://docs.k3s.io/quick-start) guide and install master and node on Raspberry (1-node cluster).
-3. Configure the remote connection from working machine to the k3s cluster
+3. Configure the remote connection from working machine to the k3s cluster and install kubectl to the working machine to be able to use this connection
 
 # Setup
 
