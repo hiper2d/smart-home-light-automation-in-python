@@ -1,5 +1,15 @@
 # Smart light control system in home WiFi network
 
+## Update 1/8/2023
+
+I've decided to continue deloping this project with some redesign:
+- I'm going to use Kubernetis installed on my Raspberi Pi server. All backend services, MQTT queue server, database storages will be in Kubernetis with some deployment automation from my working machine
+- I plan to extend the fulctionality so it supports other types of devices except just lings (motion detectors, cameras). I also want to introduce grouping of devices with ability co control the group from UI. In future I want to add sripting support so devices can sent commands to each other while I can program this logic on UI
+- I want to extend UI to supprt everything above
+- All of this will require more infrastructure: database to keep configs and states (Cassandra or Postgress), cache to keep agent status realtime information (Redis), reverse proxy server
+- I want to split the backend web service into several: ping service to accept ping messages from devices, command seervice to send commands to devices controlled by UI, confige servers to provide groups and device configurations to devices, maybe something else
+- I've decided to rewrite the backend from Python to Kotlin. Python will remain the programming language for devices
+
 The goal of this project:
 * Design devices (hardware and firmware) that can be controlled over a web application in a home WiFi network
 * Each device based on ESP8266 WiFi module
