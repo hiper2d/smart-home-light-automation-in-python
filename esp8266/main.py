@@ -15,7 +15,7 @@ def upscale(num: int) -> int:
     return int((num - 1) / scale_coefficient / brightness)
 
 
-mqtt_server = '192.168.1.36'
+mqtt_server = '192.168.4.49'
 
 client_id = ubinascii.hexlify(machine.unique_id())
 mac = ubinascii.hexlify(network.WLAN().config('mac'),':')
