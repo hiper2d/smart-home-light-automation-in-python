@@ -2,8 +2,8 @@ import network
 import gc
 gc.collect()
 
-ssid = 'Simona2G'
-password = '<put you WiFi pass here>'
+ssid = 'SakoWiFi'
+password = 'greenpeer742'
 
 station = network.WLAN(network.STA_IF)
 station.active(True)
