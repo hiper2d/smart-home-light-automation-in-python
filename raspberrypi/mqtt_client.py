@@ -1,4 +1,4 @@
-import time
+import time, os
 from datetime import datetime
 from typing import Dict
 
@@ -6,9 +6,9 @@ import paho.mqtt.client as mqtt_client
 
 from util import Device
 
+mqtt_host = os.getenv('MQTT_HOST', 'localhost')
 default_client_id = 'Raspberry Pi Server'
 ping_sub = 'home/ping'
-host_ip = '192.168.1.36'
 
 
 class MqttClient:
@@ -58,7 +58,8 @@ class MqttClient:
 
     def start(self):
         self.client.loop_start()
-        self.client.connect(host_ip)
+        print(mqtt_host)
+        self.client.connect(mqtt_host, 1883)
 
     def send_light_command_to_clients(self, on: bool, rgba_str: str):
         for device_id, device in self.devices.items():

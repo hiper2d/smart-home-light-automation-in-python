@@ -4,14 +4,14 @@ import threading
 from typing import List, Union, Dict
 
 from flask import Flask, render_template, request, Response, make_response, jsonify
-from flask_cors import CORS
+import flask_cors
 
 from mqtt_client import MqttClient
 from util import MessageAnnouncer, Device
 
-template_dir = os.path.abspath('public')
+template_dir = os.path.abspath('static')
 app = Flask(__name__, template_folder=template_dir, static_url_path='', static_folder=template_dir)
-cors = CORS(app)
+cors = flask_cors.CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 mqtt_client = MqttClient()
 announcer = MessageAnnouncer()
@@ -81,4 +81,4 @@ if __name__ == '__main__':
             pass
     except:
         print('Cannot connect to MQTT broker')
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', port=5002)

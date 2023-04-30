@@ -5,22 +5,28 @@ services:
     image: eclipse-mosquitto
     ports:
       - "1883:1883"
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
 
-#  web:
-#    build: ./raspberrypi
-#    ports:
-#      - "5000:5000"
-#    depends_on:
-#      - mosquitto
-
-  echo-service:
+  backend:
     build:
-      context: ./echo-service
+      context: ./raspberrypi
       dockerfile: ./docker/Dockerfile
+    environment:
+      MQTT_HOST: mosquitto
     ports:
-      - "5001:5001"
+      - "5002:5002"
     depends_on:
       - mosquitto
+
+#  echo-service:
+#    build:
+#      context: ./echo-service
+#      dockerfile: ./docker/Dockerfile
+#    ports:
+#      - "5001:5001"
+#    depends_on:
+#      - mosquitto
 
 #  angular:
 #    build: ./angular
