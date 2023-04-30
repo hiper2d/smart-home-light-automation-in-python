@@ -19,18 +19,19 @@ services:
     depends_on:
       - mosquitto
 
-#  echo-service:
-#    build:
-#      context: ./echo-service
-#      dockerfile: ./docker/Dockerfile
-#    ports:
-#      - "5001:5001"
-#    depends_on:
-#      - mosquitto
+  echo-service:
+    build:
+      context: ./echo-service
+      dockerfile: ./docker/Dockerfile
+    ports:
+      - "5001:5001"
 
-#  angular:
-#    build: ./angular
-#    ports:
-#      - "4200:4200"
-#    depends_on:
-#      - web
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ./docker/Dockerfile
+    ports:
+      - "8080:80"
+    restart: always
+    depends_on:
+      - backend
