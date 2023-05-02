@@ -1,0 +1,11 @@
+li {
+  list-style-type: none;
+
+  &:first-child {
+    margin-bottom: 20px;
+  }
+
+  app-device {
+    height: 100%;
+  }
+}
