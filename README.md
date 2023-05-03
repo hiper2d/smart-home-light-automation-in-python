@@ -123,14 +123,14 @@ Open the address [http://<raspberry_ip>:5000/](http://<raspberry_ip>:5000/). You
 Simulate a new device ping message, so the webserver can pick it up:
 
 ```bash
-mosquitto_pub -h localhost -t "home/ping" -m '{"id": "abc", "rgba": [0, 1023, 61, 1]}'
+mosquitto_pub -h <raspberry_ip> -t "home/ping" -m '{"mac": "0", "id": "abc", "rgb": [0, 1023, 61]}'
  ```
 New device should appear on the webpage. If it doesn't send ping messages regularly, the webserver will consider it as inactive in 60 seconds and remove from the webpage.
 
 While the device is on the webpage, you can control it. To monitor messages from the frontend to devices you can subscribe to the device topic:
 
 ```bash
-mosquitto_sub -h localhost -t "home/abc"
+mosquitto_sub -h <raspberry_ip> -t "home/abc"
  ```
 
 ### ESP8266
