@@ -19,8 +19,7 @@ I've decided to continue deloping this project with some redesign:
 
 * ESP8266 firmware in MicroPython for devices
 * SMD5050 RGB LED Strip Lights as controlled devices
-* Website in Angular 12 server by Python/Flask webserver hosted on Raspberry Pi server to control devices
-* SQL Lite database on Raspberry Pi to remember device user settings
+* Website in Angular 15 server by Python/Flask webserver hosted on Raspberry Pi server to control devices
 * Mosquitto messaging queue for MQTT communication between  
 * Electrical circuits and diagrams of devices
 * Guidance of how to setup this all
@@ -28,16 +27,19 @@ I've decided to continue deloping this project with some redesign:
 This is how the web interface looks like for now:
 ![interface](./images/interface.png)
 
+# Build Images
+
+To build docker images, install Docker, Docker Compose and run the following:
+```bash
+docker-compose build
+```
+
+You can update the image name for `backend` and `frontend` services with your DockerHub repository and push the images into your repo:
+```bash
+docker-compose push
+```
+
 # Installation
-
-### k3s
-
-[Here](https://www.youtube.com/watch?v=rOXkutK8ANc) is pretty good video of how to install k3s t Raspberi Pi. I use same Raspberry server as a master and a node. Below are intallations steps:
-1. Enable cgroups on Raspberry
-2. Download k3s as per it's [Quick Start](https://docs.k3s.io/quick-start) guide and install master and node on Raspberry (1-node cluster).
-3. Configure the remote connection from working machine to the k3s cluster and install kubectl to the working machine to be able to use this connection
-
-# Setup
 
 ### Raspberry Pi
 
@@ -49,7 +51,7 @@ Raspberry hosts Mosquitto MQTT message broker and Python webserver. There for ne
     sudo apt full-upgrade
     ```
 
-2. Install Mosquitto ([link](https://mosquitto.org/download/))
+2. Install Docker and Docker Compose
         
     ```bash
     sudo apt install mosquitto mosquitto-clients

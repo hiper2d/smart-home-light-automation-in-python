@@ -14,6 +14,7 @@ services:
       dockerfile: ./docker/Dockerfile
     environment:
       MQTT_HOST: mosquitto
+    image: hiper2d/smart-home-backend:${IMAGE_TAG:-latest}
     ports:
       - "5002:5002"
     depends_on:
@@ -30,6 +31,7 @@ services:
     build:
       context: ./frontend
       dockerfile: ./docker/Dockerfile
+    image: hiper2d/smart-home-frontend:${IMAGE_TAG:-latest}
     ports:
       - "8080:80"
     restart: always
