@@ -19,8 +19,8 @@ I've decided to continue deloping this project with some redesign:
 
 * ESP8266 firmware in MicroPython for devices
 * SMD5050 RGB LED Strip Lights as controlled devices
-* Website in Angular 15 server by Python/Flask webserver hosted on Raspberry Pi server to control devices
-* Mosquitto messaging queue for MQTT communication between  
+* [Frontend](frontend/README.md) and [Backend](raspberrypi): Website in Angular 15 server by Python/Flask webserver hosted on Raspberry Pi server to control devices
+* [Mosquitto](mosquitto/README.md): Mosquitto messaging queue for MQTT communication between  
 * Electrical circuits and diagrams of devices
 * Guidance of how to setup this all
 
@@ -39,101 +39,40 @@ You can update the image name for `backend` and `frontend` services with your Do
 docker-compose push
 ```
 
-# Installation
+# Installation to Raspberry Pi
 
 ### Raspberry Pi
 
-Raspberry hosts Mosquitto MQTT message broker and Python webserver. There for need to install Mosquitto, update Python up to 3.9 version and install Python libraries.
-1. Connect Raspberry Pi to home WiFi and update it:
-   
-    ```bash
-    sudo apt update
-    sudo apt full-upgrade
-    ```
-
-2. Install Docker and Docker Compose
-        
-    ```bash
-    sudo apt install mosquitto mosquitto-clients
-    sudo systemctl status mosquitto
-    ```
-
-    This command will return the status of the “mosquitto” service. You should see the text “active (running)” if the service has started up properly.
-
-    For testing purposes you can run a Mosquitto client and listen for messages in the topic we are going to use:
-    
-    ```bash
-    mosquitto_sub -h <raspberry_ip> -t "home/ping"
-    # where <raspberry_ip> is the IP address of Raspberry or 'localhost'
-    ```
-   
-    All devices will send an information about their status here every 15 seconds.
-    To send a message to the topic from a terminal use the command:
-   
-    ```bash
-    mosquitto_pub -h <raspberry_ip> -t "home/ping" -m '{"mac": "00:00:00:00:00:00", "id": "ab0c9d00", "rgb": [0, 1023, 61]}'
-    ```
-
-3. Install Python libraries
-
-   ```bash
-   # create virtual environment (this is optional)
-   python3 -m venv ~/path/to/venv
-   source ~/path/to/venv/bic/activate
-   # install Python libraries
-   pip3 install flask flask_cors mqtt_client
-   ```
-
-4. Upgrade node.js and npm
-
-   ```bash
-   sudo apt remove nodejs
-   curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
-   sudo apt install nodejs
-   # check versions of node and npm
-   node -v
-   npm -v
-   ```
-
-5. Checkout project on Raspberry Pi to build and run webserver
-     
-   ```bash
-   # create some directory and navigate into it, clone the project
-   git clone git@github.com:hiper2d/smart-home-light-automation-in-python.git
-
-   # navigate to the angular directory
-   cd /path/to/project/smart-home-light-automation-in-python/angular
-   
-   # install frontend libraries and build frontend
-   npm install
-   npm run build
-   
-   # navigate to the respberrypi directory with Python/Flask webserver scrips
-   cd /path/to/project/smart-home-light-automation-in-python/raspberrypi
-   
-   # Add Raspberry Pi IP address to mqtt_client.py file
-   hostname -I
-   nano mqtt_client.py
-   # replace <raspberry_ip> with the real IP
-   
-   # start webserver on port 5000
-   python3 website.py
-   ```
-    
-Open the address [http://<raspberry_ip>:5000/](http://<raspberry_ip>:5000/). You should see a webpage with no devices except the 'All Devices' control.
-
-Simulate a new device ping message, so the webserver can pick it up:
-
+Just install clone the repository into some folder on Raspberry Pi and start it using `docker-compose`:
 ```bash
-mosquitto_pub -h localhost -t "home/ping" -m '{"id": "abc", "rgba": [0, 1023, 61, 1]}'
- ```
-New device should appear on the webpage. If it doesn't send ping messages regularly, the webserver will consider it as inactive in 60 seconds and remove from the webpage.
+docker-compose up
+```
 
-While the device is on the webpage, you can control it. To monitor messages from the frontend to devices you can subscribe to the device topic:
-
+It's required to install Docker and Docker Compose to Raspberry Pi and enable the MQTT server port:
 ```bash
-mosquitto_sub -h localhost -t "home/abc"
- ```
+# Google how to install Docker and Docker Compose
+# Open Mosquitto port:
+sudo ufw allow 1883/tcp
+sudo ufw allow 1883/udp
+```
+
+# Prepare Development Environment
+
+To work with this project as a programmer, you need to have Python 3, Node.js installed. You also need Docker and Docker compose
+
+You can run it from Docker images. Use `--build` to rebuild igamges from the source code before ruggin:
+```bash
+docker-compose --build up
+```
+Or run only the Mosquitto server form a container. `frontend`, `backend` server can be started in a terminal or from IDE:
+```bash
+# from the project root directory
+docker-compose mosquitto up
+# from the frontend directory
+ng serve --host 0.0.0.0 --port 80
+# from the backend directory
+python3 backend/website.py
+```
 
 ### ESP8266
 
