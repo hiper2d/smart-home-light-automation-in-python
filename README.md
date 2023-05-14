@@ -1,26 +1,16 @@
 # Smart light control system in home WiFi network
 
-## Update 1/8/2023
-
-I've decided to continue deloping this project with some redesign:
-- I'm going to use Kubernetis installed on my Raspberi Pi server. All backend services, MQTT queue server, database storages will be in Kubernetis with some deployment automation from my working machine
-- I plan to extend the fulctionality so it supports other types of devices except just lings (motion detectors, cameras). I also want to introduce grouping of devices with ability co control the group from UI. In future I want to add sripting support so devices can sent commands to each other while I can program this logic on UI
-- I want to extend UI to supprt everything above
-- All of this will require more infrastructure: database to keep configs and states (Cassandra or Postgress), cache to keep agent status realtime information (Redis), reverse proxy server
-- I want to split the backend web service into several: ping service to accept ping messages from devices, command seervice to send commands to devices controlled by UI, confige servers to provide groups and device configurations to devices, maybe something else
-- I've decided to rewrite the backend from Python to Kotlin. Python will remain the programming language for devices
-
 ### Goals
 * Design devices (hardware and firmware) that can be controlled over a web application in a home WiFi network
 * Each device based on ESP8266 WiFi module
 * Raspberry Pi 4 server to control devices and to host a web client
+* So far, devices are RGB lights but I plan to add more types in the future. The next type is a sensor
 
 ### Project structure
-
-* ESP8266 firmware in MicroPython for devices
-* SMD5050 RGB LED Strip Lights as controlled devices
 * [Frontend](frontend/README.md) and [Backend](raspberrypi): Website in Angular 15 server by Python/Flask webserver hosted on Raspberry Pi server to control devices
-* [Mosquitto](mosquitto/README.md): Mosquitto messaging queue for MQTT communication between  
+* [Mosquitto](mosquitto/README.md): Mosquitto messaging queue for MQTT communication between
+* [ESP8266](esp8266) firmware in MicroPython for devices
+* SMD5050 RGB LED Strip Lights as controlled devices
 * Electrical circuits and diagrams of devices
 * Guidance of how to setup this all
 
@@ -64,15 +54,18 @@ You can run it from Docker images. Use `--build` to rebuild igamges from the sou
 ```bash
 docker-compose --build up
 ```
+In this case the main UI is available at the port 8080
+
 Or run only the Mosquitto server form a container. `frontend`, `backend` server can be started in a terminal or from IDE:
 ```bash
 # from the project root directory
-docker-compose mosquitto up
+docker-compose up mosquitto
 # from the frontend directory
 ng serve --host 0.0.0.0 --port 80
 # from the backend directory
 python3 backend/website.py
 ```
+In this case the main UI is available at the port 80
 
 ### ESP8266
 
