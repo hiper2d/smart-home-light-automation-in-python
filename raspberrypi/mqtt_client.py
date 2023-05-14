@@ -75,6 +75,8 @@ class MqttClient:
         result = self.client.publish(topic, device_json)
         status = result[0]
         if status == 0:
+            if self.on_device_updated:
+                self.on_device_updated(device, 'update')
             print(f"Send `{device_json}` to topic `{topic}`")
         else:
             print(f"Failed to send message to topic {topic}")
