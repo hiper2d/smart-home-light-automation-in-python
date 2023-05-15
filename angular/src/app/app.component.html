@@ -1,7 +1,0 @@
-<div [formGroup]="deviceForm">
-  <ul formArrayName="devices">
-    <li *ngFor="let device of devices.controls; let i=index">
-      <app-device [formControlName]="i" (manualChange)="deviceChange($event)"></app-device>
-    </li>
-  </ul>
-</div>

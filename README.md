@@ -29,6 +29,12 @@ You can update the image name for `backend` and `frontend` services with your Do
 docker-compose push
 ```
 
+Delete all existing containers and images:
+```bash
+docker rm -vf $(docker ps -aq)
+docker rmi -f $(docker images -aq)
+```
+
 # Installation to Raspberry Pi
 
 ### Raspberry Pi
@@ -38,12 +44,13 @@ Just install clone the repository into some folder on Raspberry Pi and start it 
 docker-compose up
 ```
 
-It's required to install Docker and Docker Compose to Raspberry Pi and enable the MQTT server port:
+It's required to install Docker and Docker Compose to Raspberry Pi and open the MQTT server port and Nginx frontend webserver port:
 ```bash
-# Google how to install Docker and Docker Compose
-# Open Mosquitto port:
+# Open Mosquitto ans Nginx ports:
 sudo ufw allow 1883/tcp
 sudo ufw allow 1883/udp
+sudo ufw allow 8080/tcp
+sudo ufw allow 8080/udp
 ```
 
 # Prepare Development Environment

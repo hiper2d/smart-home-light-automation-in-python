@@ -1,5 +1,8 @@
 version: "3"
 
+networks:
+  my_network:
+
 services:
   mosquitto:
     image: eclipse-mosquitto
@@ -7,6 +10,8 @@ services:
       - "1883:1883"
     volumes:
       - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    networks:
+      - my_network
 
   backend:
     build:
@@ -19,13 +24,8 @@ services:
       - "5002:5002"
     depends_on:
       - mosquitto
-
-  echo-service:
-    build:
-      context: ./echo-service
-      dockerfile: ./docker/Dockerfile
-    ports:
-      - "5001:5001"
+    networks:
+      - my_network
 
   frontend:
     build:
@@ -37,3 +37,5 @@ services:
     restart: always
     depends_on:
       - backend
+    networks:
+      - my_network
